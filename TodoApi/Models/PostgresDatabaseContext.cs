@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TodoApi.Models
+namespace GMAPI.Models
 {
-    public class MyWebApiContext: DbContext
+    public class PostgresDatabaseContext: DbContext
     { 
-        public MyWebApiContext(DbContextOptions<MyWebApiContext> options):base(options) { }
+        public PostgresDatabaseContext(DbContextOptions<PostgresDatabaseContext> options):base(options) { }
         public DbSet<User> Users { get; set; }
         public DbSet<Group> Groups { get; set; }
     }

@@ -5,17 +5,17 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TodoApi.Models;
+using GMAPI.Models;
 
-namespace TodoApi.Controllers
+namespace GMAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly MyWebApiContext _context;
+        private readonly PostgresDatabaseContext _context;
 
-        public UsersController(MyWebApiContext context)
+        public UsersController(PostgresDatabaseContext context)
         {
             _context = context;
         }

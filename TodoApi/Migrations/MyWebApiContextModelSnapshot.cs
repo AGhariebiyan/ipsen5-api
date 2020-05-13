@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using TodoApi.Models;
+using GMAPI.Models;
 
-namespace TodoApi.Migrations
+namespace GMAPI.Migrations
 {
-    [DbContext(typeof(MyWebApiContext))]
+    [DbContext(typeof(PostgresDatabaseContext))]
     partial class MyWebApiContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

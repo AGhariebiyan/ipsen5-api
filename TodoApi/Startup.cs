@@ -10,16 +10,21 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using TodoApi.Models;
+using GMAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace TodoApi
+namespace GMAPI
 {
+
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            
+            
+
             //configuration["hosturl"] = "https://192.168.178.50:5000";
         }
 
@@ -28,7 +33,11 @@ namespace TodoApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddEntityFrameworkNpgsql().AddDbContext<MyWebApiContext>(opt =>
+
+            var dbConfig = 
+
+
+            services.AddEntityFrameworkNpgsql().AddDbContext<PostgresDatabaseContext>(opt =>
             {
                 opt.UseNpgsql(Configuration.GetConnectionString("MyWebApiConnection"));
             });
@@ -46,6 +55,7 @@ namespace TodoApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+           
 
             app.UseForwardedHeaders();
             

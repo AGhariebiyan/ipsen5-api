@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using TodoApi.Models;
+using GMAPI.Models;
 
-namespace TodoApi.Migrations
+namespace GMAPI.Migrations
 {
-    [DbContext(typeof(MyWebApiContext))]
+    [DbContext(typeof(PostgresDatabaseContext))]
     [Migration("20200402080100_testdb")]
     partial class testdb
     {
