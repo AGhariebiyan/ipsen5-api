@@ -11,5 +11,6 @@ namespace GMAPI.Models
         public PostgresDatabaseContext(DbContextOptions<PostgresDatabaseContext> options):base(options) { }
         public DbSet<User> Users { get; set; }
         public DbSet<Group> Groups { get; set; }
+
     }
 }

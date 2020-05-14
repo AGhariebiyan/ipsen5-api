@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29920.165
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GM-API", "TodoApi\GM-API.csproj", "{7703053E-B39D-4835-89AF-95FD8EBACF27}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GMAPI", "TodoApi\GMAPI.csproj", "{7703053E-B39D-4835-89AF-95FD8EBACF27}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
