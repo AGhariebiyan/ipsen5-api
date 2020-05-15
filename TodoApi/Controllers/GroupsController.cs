@@ -9,6 +9,7 @@ using GMAPI.Models;
 
 namespace GMAPI.Controllers
 {
+    //VOorbeeldcongroller
     [Route("api/[controller]")]
     [ApiController]
     public class GroupsController : ControllerBase

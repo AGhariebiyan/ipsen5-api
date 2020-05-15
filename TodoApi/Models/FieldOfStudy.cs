@@ -5,11 +5,9 @@ using System.Threading.Tasks;
 
 namespace GMAPI.Models
 {
-    public class Group
+    public class FieldOfStudy
     {
-        //VOORBEELDMODEL!!!
-        public int Id { get; set; }
-        public string Name { get; set; }
-
+        public Guid Id { get; set; }
+        public String Title { get; set; }
     }
 }
