@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace GMAPI.Models
 {
+
+    //Voorbeeldmodel!
     public class User
     {
         [Key]
