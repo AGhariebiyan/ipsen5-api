@@ -19,9 +19,9 @@ namespace GMAPI.Models
 
         public bool Published { get; set; }
 
-        public int AccountId { get; set; }
+        public Account Account { get; set; }
 
-        public int CompanyId { get; set; }
+        public Company Company { get; set; }
 
         public bool Featured { get; set; }
     }

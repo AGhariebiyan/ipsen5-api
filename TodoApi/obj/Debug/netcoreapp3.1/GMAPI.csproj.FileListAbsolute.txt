@@ -145,3 +145,4 @@ C:\Users\Robin\source\repos\ipsen5-api\TodoApi\obj\Debug\netcoreapp3.1\staticweb
 C:\Users\Robin\source\repos\ipsen5-api\TodoApi\obj\Debug\netcoreapp3.1\GMAPI.dll
 C:\Users\Robin\source\repos\ipsen5-api\TodoApi\obj\Debug\netcoreapp3.1\GMAPI.pdb
 C:\Users\Robin\source\repos\ipsen5-api\TodoApi\obj\Debug\netcoreapp3.1\GMAPI.genruntimeconfig.cache
+C:\Users\Robin\source\repos\ipsen5-api\TodoApi\obj\Debug\netcoreapp3.1\GMAPI.csprojAssemblyReference.cache
