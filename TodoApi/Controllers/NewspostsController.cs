@@ -47,7 +47,7 @@ namespace GMAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutNewspost(int id, Newspost newspost)
         {
-            if (id != newspost.Id)
+            if (id != newspost.NewspostId)
             {
                 return BadRequest();
             }
@@ -82,7 +82,7 @@ namespace GMAPI.Controllers
             _context.Newspost.Add(newspost);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetNewspost", new { id = newspost.Id }, newspost);
+            return CreatedAtAction("GetNewspost", new { id = newspost.NewspostId }, newspost);
         }
 
         // DELETE: api/Newsposts/5
@@ -103,7 +103,7 @@ namespace GMAPI.Controllers
 
         private bool NewspostExists(int id)
         {
-            return _context.Newspost.Any(e => e.Id == id);
+            return _context.Newspost.Any(e => e.NewspostId == id);
         }
     }
 }

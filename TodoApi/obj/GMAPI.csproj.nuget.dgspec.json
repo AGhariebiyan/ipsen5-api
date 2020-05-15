@@ -1,27 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Robin\\source\\repos\\ipsen5-api\\TodoApi\\GMAPI.csproj": {}
+    "/Volumes/Seagate Expansion Drive/HS leiden/IPSEN5/project/ipsen5-apii/ToDoApi/GMAPI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Robin\\source\\repos\\ipsen5-api\\TodoApi\\GMAPI.csproj": {
+    "/Volumes/Seagate Expansion Drive/HS leiden/IPSEN5/project/ipsen5-apii/ToDoApi/GMAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Robin\\source\\repos\\ipsen5-api\\TodoApi\\GMAPI.csproj",
+        "projectUniqueName": "/Volumes/Seagate Expansion Drive/HS leiden/IPSEN5/project/ipsen5-apii/ToDoApi/GMAPI.csproj",
         "projectName": "GMAPI",
-        "projectPath": "C:\\Users\\Robin\\source\\repos\\ipsen5-api\\TodoApi\\GMAPI.csproj",
-        "packagesPath": "C:\\Users\\Robin\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Robin\\source\\repos\\ipsen5-api\\TodoApi\\obj\\",
+        "projectPath": "/Volumes/Seagate Expansion Drive/HS leiden/IPSEN5/project/ipsen5-apii/ToDoApi/GMAPI.csproj",
+        "packagesPath": "/Users/alirezaa/.nuget/packages/",
+        "outputPath": "/Volumes/Seagate Expansion Drive/HS leiden/IPSEN5/project/ipsen5-apii/ToDoApi/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Robin\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/alirezaa/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp3.1"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -89,7 +87,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.202/RuntimeIdentifierGraph.json"
         }
       }
     }

@@ -7,7 +7,7 @@ namespace GMAPI.Models
 {
     public class Newspost
     {
-        public int Id { get; set; }
+        public int NewspostId { get; set; }
 
         public string Title { get; set; }
 
