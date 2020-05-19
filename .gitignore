@@ -361,3 +361,4 @@ FodyWeavers.xsd
 
 #Development settings
 TodoApi/appsettings.Development.json
+/.DS_Store
