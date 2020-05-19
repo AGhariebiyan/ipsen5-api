@@ -1,4 +1,5 @@
 ﻿.vscode
-bin
-obj
+bin/
+obj/
 *.db
+.vs\TodoApi\v15\.suo
