@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GMAPI.Migrations
 {
     [DbContext(typeof(PostgresDatabaseContext))]
-    [Migration("20200519085706_addedEventModel")]
-    partial class addedEventModel
+    [Migration("20200519083910_updatedaccountmodel")]
+    partial class updatedaccountmodel
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
