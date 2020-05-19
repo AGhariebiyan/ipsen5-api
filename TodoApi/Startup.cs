@@ -12,6 +12,14 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using GMAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using GMAPI.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.CodeAnalysis.FlowAnalysis;
+using GMAPI.Dtos;
+using AutoMapper;
 
 namespace GMAPI
 {
@@ -34,6 +42,8 @@ namespace GMAPI
         public void ConfigureServices(IServiceCollection services)
         {
 
+            services.AddAutoMapper(typeof(AccountProfile));
+
             var dbConfig = 
 
 
@@ -50,6 +60,22 @@ namespace GMAPI
             {
                 options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
             });
+
+
+            services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration.GetSection("Appsettings:Token").Value)),
+                        ValidateIssuer = false,
+                        ValidateAudience = false
+                    };
+                });
+
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -70,7 +96,13 @@ namespace GMAPI
 
             app.UseRouting();
 
-            //app.UseAuthorization();
+            app.UseAuthentication();
+            
+            app.UseAuthorization();
+
+
+            //TODO herzien cors
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
             app.UseEndpoints(endpoints =>
             {
