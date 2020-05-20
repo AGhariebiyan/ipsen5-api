@@ -25,8 +25,6 @@ namespace GMAPI.Models
         [Required]
         public string EventLocationCountry { get; set; }
 
-        public Account[] EventAttendees { get; set; }
-
         public DateTime EventDate { get; set; }
     }
 }
