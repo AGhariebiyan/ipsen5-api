@@ -3,6 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
+
       "applicationUrl": "http://localhost:58878/",
       "sslPort": 44327
     }
@@ -15,6 +16,17 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
+
+    "GM-API": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "api/users",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://80.112.188.42:5001;http://80.112.188.42:5000"
+    },
+
     "GMAPI": {
       "commandName": "Project",
       "launchBrowser": true,

@@ -3,6 +3,8 @@ using GMAPI.Dtos;
 using GMAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -52,6 +54,38 @@ namespace GMAPI.Controllers
 
             //Return 201 (created)
             return StatusCode(201);
+        }
+
+        [HttpGet("jwt/validate/{jwtToken}")]
+        public async Task<IActionResult> ValidateJWT(String jwtToken)
+        {
+            var validationParameters = new TokenValidationParameters()
+            {
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:Token").Value)),
+                ValidateLifetime = true,
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true
+            };
+            
+            var tokenHandler = new JwtSecurityTokenHandler();
+            SecurityToken validatedToken = null;
+            try
+            {
+                tokenHandler.ValidateToken(jwtToken, validationParameters, out validatedToken);
+            }
+            catch(SecurityTokenException e)
+            {
+                Console.WriteLine(e.ToString());
+                return Unauthorized(); 
+            }
+            catch(Exception e)
+            { 
+                System.Diagnostics.Debug.WriteLine(e.ToString()); //something else happened
+                throw;
+            }
+            //... manual validations return false if anything untoward is discovered
+            return Ok();
         }
 
         [HttpPost("login")]

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GMAPI.Models;
+using Microsoft.Extensions.Logging;
 
 namespace GMAPI.Models
 {
@@ -11,6 +12,7 @@ namespace GMAPI.Models
     {
         public PostgresDatabaseContext(DbContextOptions<PostgresDatabaseContext> options) : base(options) { }
         public DbSet<User> Users { get; set; }
+
         public DbSet<Group> Groups { get; set; }
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Company> Companies { get; set; }
