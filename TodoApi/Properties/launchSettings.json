@@ -1,30 +1,27 @@
-﻿{
-  "$schema": "http://json.schemastore.org/launchsettings.json",
+{
   "iisSettings": {
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:50268",
-      "sslPort": 44322
+      "applicationUrl": "http://localhost:58878/",
+      "sslPort": 44327
     }
   },
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "api/users",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "GM-API": {
+    "GMAPI": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "api/users",
-      "applicationUrl": "https://localhost:5001;http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "applicationUrl": "https://192.168.178.16:5001;http://192.168.178.16:5000"
     }
   }
 }

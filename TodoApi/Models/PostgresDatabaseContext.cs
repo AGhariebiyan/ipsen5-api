@@ -20,5 +20,7 @@ namespace GMAPI.Models
 
         public DbSet<Newspost> Newspost { get; set; }
 
+        public DbSet<GMAPI.Models.Event> Event { get; set; }
+
     }
 }

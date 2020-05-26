@@ -3,15 +3,17 @@ using System;
 using GMAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace GMAPI.Migrations
 {
     [DbContext(typeof(PostgresDatabaseContext))]
-    partial class MyWebApiContextModelSnapshot : ModelSnapshot
+    [Migration("20200520133434_AddEventDescription")]
+    partial class AddEventDescription
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -113,6 +115,48 @@ namespace GMAPI.Migrations
                     b.HasIndex("ImageId");
 
                     b.ToTable("Companies");
+                });
+
+            modelBuilder.Entity("GMAPI.Models.Event", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("EventDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("EventDescription")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("EventLocationCountry")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("EventLocationName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("EventLocationPostalCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("EventLocationRegion")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("EventLocationStreet")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("EventName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Event");
                 });
 
             modelBuilder.Entity("GMAPI.Models.FieldOfStudy", b =>

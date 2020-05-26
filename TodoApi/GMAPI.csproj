@@ -4,8 +4,15 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'GM-API' ">
+    <StartAction>Project</StartAction>
+    <ExternalConsole>true</ExternalConsole>
+    <LaunchUrl>api/users</LaunchUrl>
+    <ApplicationURL>https://localhost:5001;http://localhost:5000</ApplicationURL>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.0.0" />
@@ -27,5 +34,13 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.5.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
 
+
+  <ItemGroup>
+    <Content Remove="Properties\launchSettings.json" />
+    <Content Remove="Properties\launchSettings.json" />
+  </ItemGroup>
 </Project>
