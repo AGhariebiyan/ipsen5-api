@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Images" />
+    <Folder Include="Images\ProfilePictures" />
   </ItemGroup>
 
 
