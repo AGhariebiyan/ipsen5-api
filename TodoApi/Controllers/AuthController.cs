@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using GMAPI.Data;
+﻿using GMAPI.Data;
 using GMAPI.Dtos;
 using GMAPI.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace GMAPI.Controllers
 {
@@ -36,7 +33,8 @@ namespace GMAPI.Controllers
             
             //Check if the user exists
             if (await _repo.AccountExists(accountForRegisterDto.Email)) {
-                return BadRequest("Email already exits");
+
+                return BadRequest(new { error = "Email already exists" } );
             }
 
             //Make new Account object based on the DTO
