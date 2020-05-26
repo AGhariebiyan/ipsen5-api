@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +12,9 @@ using Microsoft.AspNetCore.Authorization;
 using GMAPI.Dtos;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.Extensions.FileProviders;
 
 namespace GMAPI.Controllers
 {
@@ -20,11 +25,13 @@ namespace GMAPI.Controllers
     {
         private readonly PostgresDatabaseContext _context;
         private readonly IMapper _mapper;
+        private IWebHostEnvironment _hostingEnvironment;
 
-        public AccountsController(IMapper mapper, PostgresDatabaseContext context)
+        public AccountsController(IMapper mapper, PostgresDatabaseContext context, IWebHostEnvironment environment)
         {
             _context = context;
             _mapper = mapper;
+            _hostingEnvironment = environment;
         }
 
         // GET: api/Accounts
@@ -95,6 +102,26 @@ namespace GMAPI.Controllers
             await _context.SaveChangesAsync();
 
             return account;
+        }
+
+        [HttpPost("{id}/picture")]
+        public async Task<ActionResult<String>> SetPicture(Guid id, [FromForm] IFormFile picture)
+        {
+            var existingFile = Directory.EnumerateFiles(_hostingEnvironment.ContentRootPath +"/Images/ProfilePictures").SingleOrDefault(f => f.Contains(id + "."));
+            if(existingFile != null) System.IO.File.Delete(existingFile);
+            var uploads = Path.Combine("Images/ProfilePictures", id + "." + picture.FileName.Split('.').Last());
+            using (var fileStream = new FileStream(uploads, FileMode.Create)) {
+                await picture.CopyToAsync(fileStream);
+            }
+            return uploads;
+        }
+        
+        [HttpGet("{id}/picture")]
+        public async Task<ActionResult> GetPicture(Guid id)
+        {
+            var filename = Directory.EnumerateFiles(_hostingEnvironment.ContentRootPath +"/Images/ProfilePictures").SingleOrDefault(f => f.Contains(id + "."));
+            var file = PhysicalFile(filename, "image/jpeg");
+            return file;
         }
 
         private bool AccountExists(Guid id)
