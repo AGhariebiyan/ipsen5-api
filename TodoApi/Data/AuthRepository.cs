@@ -52,6 +52,7 @@ namespace GMAPI.Data
             account.PasswordHash = passwordHash;
             account.PasswordSalt = passwordSalt;
 
+            
             await _context.Accounts.AddAsync(account);
             await _context.SaveChangesAsync();
 

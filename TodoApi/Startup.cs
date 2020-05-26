@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.CodeAnalysis.FlowAnalysis;
 using GMAPI.Dtos;
 using AutoMapper;
+using GMAPI.Other;
 
 namespace GMAPI
 {
@@ -92,13 +93,15 @@ namespace GMAPI
 
           
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
 
             app.UseRouting();
 
             app.UseAuthentication();
             
             app.UseAuthorization();
+            
+            app.UseMiddleware<RequestLoggingMiddleware>();
 
 
             //TODO herzien cors

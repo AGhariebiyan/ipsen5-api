@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace GMAPI.Dtos
 {
@@ -26,6 +27,8 @@ namespace GMAPI.Dtos
         
         
         public string MiddleName { get; set; }
+        
+        public IFormFile ProfileImage { get; set; }
              
     }
 }
