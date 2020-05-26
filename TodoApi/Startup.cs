@@ -92,8 +92,8 @@ namespace GMAPI
             }
 
           
-
-            // app.UseHttpsRedirection();
+            //TODO Enable
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
 
