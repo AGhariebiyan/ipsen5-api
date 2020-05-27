@@ -363,5 +363,7 @@ FodyWeavers.xsd
 TodoApi/appsettings.Development.json
 /TodoApi/obj/Debug/netcoreapp3.1/GMAPI.assets.cache
 /.DS_Store
+/TodoApi/Images/ProfilePictures/5f642794-9859-48a7-ba19-149f596952c9.png
+/TodoApi/Migrations/PostgresDatabaseContextModelSnapshot.cs
 /TodoApi/Properties/launchSettings.json
 /TodoApi/appsettings.Development.json

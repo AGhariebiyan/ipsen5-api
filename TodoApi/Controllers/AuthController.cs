@@ -8,9 +8,11 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyModel;
 
 namespace GMAPI.Controllers
 {
@@ -21,10 +23,12 @@ namespace GMAPI.Controllers
 
         private readonly IAuthRepository _repo;
         private readonly IConfiguration _config;
+        private readonly AccountsController _accounts;
 
-        public AuthController(IAuthRepository repo, IConfiguration config) {
+        public AuthController(IAuthRepository repo, IConfiguration config, AccountsController accountsController) {
             _repo = repo;
             _config = config;
+            _accounts = accountsController;
         }
 
         [HttpPost("register")]
@@ -84,8 +88,13 @@ namespace GMAPI.Controllers
                 System.Diagnostics.Debug.WriteLine(e.ToString()); //something else happened
                 throw;
             }
+
+            var decodedToken = tokenHandler.ReadJwtToken(jwtToken);
+            var id = decodedToken.Claims.First(claim => claim.Type == "nameid").Value;
+            var userAccount = _accounts.GetAccount(Guid.Parse(id)).Result.Value;
+            
             //... manual validations return false if anything untoward is discovered
-            return Ok();
+            return Ok(new {account = userAccount});
         }
 
         [HttpPost("login")]
