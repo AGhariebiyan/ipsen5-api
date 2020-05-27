@@ -364,3 +364,4 @@ TodoApi/appsettings.Development.json
 /TodoApi/obj/Debug/netcoreapp3.1/GMAPI.assets.cache
 /.DS_Store
 /TodoApi/Properties/launchSettings.json
+/TodoApi/appsettings.Development.json
