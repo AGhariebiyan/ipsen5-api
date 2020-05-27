@@ -11,48 +11,48 @@ namespace GMAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class NewspostsController : ControllerBase
+    public class NewsController : ControllerBase
     {
         private readonly PostgresDatabaseContext _context;
 
-        public NewspostsController(PostgresDatabaseContext context)
+        public NewsController(PostgresDatabaseContext context)
         {
             _context = context;
         }
 
-        // GET: api/Newsposts
+        // GET: api/News
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Newspost>>> GetNewspost()
+        public async Task<ActionResult<IEnumerable<News>>> GetNews()
         {
-            return await _context.Newspost.ToListAsync();
+            return await _context.News.ToListAsync();
         }
 
-        // GET: api/Newsposts/5
+        // GET: api/News/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Newspost>> GetNewspost(int id)
+        public async Task<ActionResult<News>> GetNews(Guid id)
         {
-            var newspost = await _context.Newspost.FindAsync(id);
+            var news = await _context.News.FindAsync(id);
 
-            if (newspost == null)
+            if (news == null)
             {
                 return NotFound();
             }
 
-            return newspost;
+            return news;
         }
 
-        // PUT: api/Newsposts/5
+        // PUT: api/News/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutNewspost(int id, Newspost newspost)
+        public async Task<IActionResult> PutNews(Guid id, News news)
         {
-            if (id != newspost.Id)
+            if (id != news.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(newspost).State = EntityState.Modified;
+            _context.Entry(news).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace GMAPI.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!NewspostExists(id))
+                if (!NewsExists(id))
                 {
                     return NotFound();
                 }
@@ -73,37 +73,37 @@ namespace GMAPI.Controllers
             return NoContent();
         }
 
-        // POST: api/Newsposts
+        // POST: api/News
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<Newspost>> PostNewspost(Newspost newspost)
+        public async Task<ActionResult<News>> PostNews(News news)
         {
-            _context.Newspost.Add(newspost);
+            _context.News.Add(news);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetNewspost", new { id = newspost.Id }, newspost);
+            return CreatedAtAction("GetNews", new { id = news.Id }, news);
         }
 
-        // DELETE: api/Newsposts/5
+        // DELETE: api/News/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Newspost>> DeleteNewspost(int id)
+        public async Task<ActionResult<News>> DeleteNews(Guid id)
         {
-            var newspost = await _context.Newspost.FindAsync(id);
-            if (newspost == null)
+            var news = await _context.News.FindAsync(id);
+            if (news == null)
             {
                 return NotFound();
             }
 
-            _context.Newspost.Remove(newspost);
+            _context.News.Remove(news);
             await _context.SaveChangesAsync();
 
-            return newspost;
+            return news;
         }
 
-        private bool NewspostExists(int id)
+        private bool NewsExists(Guid id)
         {
-            return _context.Newspost.Any(e => e.Id == id);
+            return _context.News.Any(e => e.Id == id);
         }
     }
 }

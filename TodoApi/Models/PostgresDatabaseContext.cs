@@ -20,11 +20,11 @@ namespace GMAPI.Models
         public DbSet<Attended> Attended { get; set; }
         public DbSet<FieldOfStudy> Studies { get; set; } 
 
-        public DbSet<Newspost> Newspost { get; set; }
-
         public DbSet<GMAPI.Models.Event> Event { get; set; }
 
         public DbSet<GMAPI.Models.Participant> Participant { get; set; }
+
+        public DbSet<GMAPI.Models.News> News { get; set; }
 
     }
 }
