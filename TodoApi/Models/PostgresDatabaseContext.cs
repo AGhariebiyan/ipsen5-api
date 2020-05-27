@@ -24,5 +24,7 @@ namespace GMAPI.Models
 
         public DbSet<GMAPI.Models.Event> Event { get; set; }
 
+        public DbSet<GMAPI.Models.Participant> Participant { get; set; }
+
     }
 }
