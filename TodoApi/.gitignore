@@ -4,3 +4,4 @@ obj/
 *.db
 .vs\TodoApi\v15\.suo
 appsettings.Development.json
+Properties/launchSettings.json
