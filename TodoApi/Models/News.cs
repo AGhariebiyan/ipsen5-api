@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace GMAPI.Models
 {
-    public class Newspost
+    public class News
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public string Title { get; set; }
 
@@ -19,9 +20,9 @@ namespace GMAPI.Models
 
         public bool Published { get; set; }
 
-        public int AccountId { get; set; }
-
-        public int CompanyId { get; set; }
+        public Guid AccountId { get; set; }
+        [ForeignKey("AccountId")]
+        public virtual Account Account { get; set; }
 
         public bool Featured { get; set; }
     }
