@@ -20,6 +20,7 @@ namespace GMAPI.Models
         public DbSet<Attended> Attended { get; set; }
         public DbSet<FieldOfStudy> Studies { get; set; } 
 
+        public DbSet<PermissionRole> PermissionRoles { get; set; }
         public DbSet<GMAPI.Models.Event> Event { get; set; }
 
         public DbSet<GMAPI.Models.Participant> Participant { get; set; }

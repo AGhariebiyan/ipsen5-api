@@ -15,6 +15,7 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.FileProviders;
+using System.Security.Claims;
 
 namespace GMAPI.Controllers
 {
@@ -53,6 +54,21 @@ namespace GMAPI.Controllers
             }
 
             return _mapper.Map<AccountDto>(account);
+        }
+
+        [HttpGet("me")]
+        public async Task<ActionResult<AccountForMeDto>> GetMyAccount()
+        {
+            Guid id = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            var account = await _context.Accounts.Include(a => a.Role).FirstOrDefaultAsync(a => a.Id == id);
+
+            if (account == null)
+            {
+                return NotFound();
+            }
+
+            return _mapper.Map<AccountForMeDto>(account);
         }
 
         // PUT: api/Accounts/5

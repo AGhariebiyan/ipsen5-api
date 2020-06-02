@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GMAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GMAPI.Controllers
 {
     //VOorbeeldcongroller
+    [Authorize(Roles="admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class GroupsController : ControllerBase

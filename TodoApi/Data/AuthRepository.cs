@@ -19,7 +19,7 @@ namespace GMAPI.Data
 
         public async Task<Account> Login(string email, string password)
         {
-            var Account = await _context.Accounts.FirstOrDefaultAsync(x => x.Email == email);
+            var Account = await _context.Accounts.Include(a => a.Role).FirstOrDefaultAsync(x => x.Email == email);
 
             if (Account == null) {
                 return null;
@@ -52,7 +52,10 @@ namespace GMAPI.Data
             account.PasswordHash = passwordHash;
             account.PasswordSalt = passwordSalt;
 
-            
+            PermissionRole nonMemberAccount = await _context.PermissionRoles.FirstOrDefaultAsync(p => p.InternalName == "non-member");
+
+            account.RoleId = nonMemberAccount.Id;
+
             await _context.Accounts.AddAsync(account);
             await _context.SaveChangesAsync();
 
