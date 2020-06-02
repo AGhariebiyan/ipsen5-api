@@ -13,6 +13,9 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyModel;
+using System.Collections.Generic;
+using AutoMapper;
+using Microsoft.AspNetCore.Mvc.ActionConstraints;
 
 namespace GMAPI.Controllers
 {
@@ -24,11 +27,19 @@ namespace GMAPI.Controllers
         private readonly IAuthRepository _repo;
         private readonly IConfiguration _config;
         private readonly AccountsController _accounts;
+        private readonly IAccountRepository _accountRepo;
+        private readonly IMapper _mapper;
 
-        public AuthController(IAuthRepository repo, IConfiguration config, AccountsController accountsController) {
+        public AuthController(IAuthRepository repo, 
+            IConfiguration config, 
+            AccountsController accountsController,
+            IAccountRepository accountRepo,
+            IMapper mapper) {
             _repo = repo;
             _config = config;
             _accounts = accountsController;
+            _accountRepo = accountRepo;
+            _mapper = mapper;
         }
 
         [HttpPost("register")]
@@ -51,6 +62,9 @@ namespace GMAPI.Controllers
                 LastName = accountForRegisterDto.LastName,
                 MiddleName = accountForRegisterDto.MiddleName
             };
+
+           
+
 
             //Create the account
             var createdAccount = await _repo.Register(accountToCreate, accountForRegisterDto.Password);
@@ -91,10 +105,13 @@ namespace GMAPI.Controllers
 
             var decodedToken = tokenHandler.ReadJwtToken(jwtToken);
             var id = decodedToken.Claims.First(claim => claim.Type == "nameid").Value;
-            var userAccount = _accounts.GetAccount(Guid.Parse(id)).Result.Value;
             
+            //var userAccount = _accounts.GetMyAccount().Result.Value
+            var userAccount = await _accountRepo.GetFullAccount(Guid.Parse(id));
+
+            var accountToReturn = _mapper.Map<AccountForMeDto>(userAccount);
             //... manual validations return false if anything untoward is discovered
-            return Ok(new {account = userAccount});
+            return Ok(new {account = accountToReturn});
         }
 
         [HttpPost("login")]
@@ -105,10 +122,17 @@ namespace GMAPI.Controllers
                 return Unauthorized();
             }
 
-            var claims = new[] {
+           
+            var claims = new List<Claim> {
                 new Claim(ClaimTypes.NameIdentifier, accountFromRepo.Id.ToString()),
                 new Claim(ClaimTypes.Email,  accountFromRepo.Email)
             };
+            if (accountFromRepo.RoleId != null) {
+                claims.Add(new Claim(ClaimTypes.Role, accountFromRepo.Role.InternalName));
+            };
+            
+
+           
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:Token").Value));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);

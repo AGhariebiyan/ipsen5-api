@@ -43,7 +43,7 @@ namespace GMAPI
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddAutoMapper(typeof(AccountProfile));
+            services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
 
             var dbConfig = 
 
@@ -64,6 +64,7 @@ namespace GMAPI
 
             services.AddMvc().AddControllersAsServices();
             services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
