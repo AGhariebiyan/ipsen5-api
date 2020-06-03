@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -25,8 +26,10 @@ namespace GMAPI.Models
         public String TwitterUrl { get; set; }
         public String InstagramUrl { get; set; }
         public Boolean VerifiedEmail { get; set; }
-        public Image Image { get; set; }
-        public Guid ImageId { get; set; }
+        
+        [ForeignKey("ImageId")]
+        public Image? Image { get; set; }
+        public Guid? ImageId { get; set; }
 
 
 
