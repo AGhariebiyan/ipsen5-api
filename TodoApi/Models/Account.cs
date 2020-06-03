@@ -26,6 +26,7 @@ namespace GMAPI.Models
         public String InstagramUrl { get; set; }
         public Boolean VerifiedEmail { get; set; }
         public Image Image { get; set; }
+        public Guid ImageId { get; set; }
 
 
 

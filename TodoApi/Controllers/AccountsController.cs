@@ -65,14 +65,15 @@ namespace GMAPI.Controllers
         {
             Guid id = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-            var account = await _context.Accounts.Include(a => a.Role).FirstOrDefaultAsync(a => a.Id == id);
+            var account = await _repo.GetFullAccount(id);
 
             if (account == null)
             {
                 return NotFound();
             }
+            var returnAccount = _mapper.Map<AccountForMeDto>(account);
 
-            return _mapper.Map<AccountForMeDto>(account);
+            return Ok(returnAccount);
         }
 
         // PUT: api/Accounts/5

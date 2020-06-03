@@ -130,8 +130,11 @@ namespace GMAPI.Controllers
             
             var account = await _accountRepo.GetAccount(userId);
             account.VerifiedEmail = true;
-            await _accounts.PutAccount(userId, account);
-            return Ok("Email has been verified");
+
+            if (await _accountRepo.SaveAll()) {
+                return Ok("Email has been verified");
+            }
+            throw new Exception("Something went wrong");
 
         }
 
