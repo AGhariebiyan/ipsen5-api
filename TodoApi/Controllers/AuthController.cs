@@ -14,7 +14,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyModel;
 using System.Collections.Generic;
+using System.Timers;
 using AutoMapper;
+using GMAPI.Other;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 
 namespace GMAPI.Controllers
@@ -24,6 +26,7 @@ namespace GMAPI.Controllers
     public class AuthController : ControllerBase
     {
 
+        
         private readonly IAuthRepository _repo;
         private readonly IConfiguration _config;
         private readonly AccountsController _accounts;
@@ -69,6 +72,8 @@ namespace GMAPI.Controllers
             //Create the account
             var createdAccount = await _repo.Register(accountToCreate, accountForRegisterDto.Password);
 
+            //Send verification Email
+            EmailService.CreateEmailVerificationInstance(createdAccount);
 
             //Return 201 (created)
             return StatusCode(201);
@@ -114,6 +119,22 @@ namespace GMAPI.Controllers
             return Ok(new {account = accountToReturn});
         }
 
+        [HttpGet("email/verify={verificationId}")]
+
+        public async Task<IActionResult> verifyEmail(Guid verificationId)
+        {
+            if (!EmailService.verifications.TryGetValue(verificationId, out var userId))
+            {
+                return Ok("Link is expired please try to login again to recieve a new email");
+            };
+            
+            var account = await _accountRepo.GetAccount(userId);
+            account.VerifiedEmail = true;
+            await _accounts.PutAccount(userId, account);
+            return Ok("Email has been verified");
+
+        }
+
         [HttpPost("login")]
         public async Task<IActionResult> Login(AccountForLoginDto accountForLoginDto) {
             var accountFromRepo = await _repo.Login(accountForLoginDto.Email.ToLower().Trim(), accountForLoginDto.Password);
@@ -154,5 +175,7 @@ namespace GMAPI.Controllers
             });
                
         }
+        
+
     }
 }

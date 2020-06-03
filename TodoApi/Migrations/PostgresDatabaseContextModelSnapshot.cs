@@ -67,6 +67,9 @@ namespace GMAPI.Migrations
                     b.Property<string>("TwitterUrl")
                         .HasColumnType("text");
 
+                    b.Property<bool>("VerifiedEmail")
+                        .HasColumnType("boolean");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ImageId");
