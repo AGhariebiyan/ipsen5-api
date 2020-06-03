@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.FileProviders;
 using System.Security.Claims;
+using GMAPI.Data;
 
 namespace GMAPI.Controllers
 {
@@ -27,12 +28,14 @@ namespace GMAPI.Controllers
         private readonly PostgresDatabaseContext _context;
         private readonly IMapper _mapper;
         private IWebHostEnvironment _hostingEnvironment;
+        private IAccountRepository _repo;
 
-        public AccountsController(IMapper mapper, PostgresDatabaseContext context, IWebHostEnvironment environment)
+        public AccountsController(IMapper mapper, PostgresDatabaseContext context, IWebHostEnvironment environment, IAccountRepository repo)
         {
             _context = context;
             _mapper = mapper;
             _hostingEnvironment = environment;
+            _repo = repo;
         }
 
         // GET: api/Accounts
@@ -75,14 +78,16 @@ namespace GMAPI.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAccount(Guid id, Account account)
+        public async Task<IActionResult> PutAccount(Guid id, AccountForUpdateDto accountForUpdate)
         {
-            if (id != account.Id)
+            if (id != accountForUpdate.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(account).State = EntityState.Modified;
+            var accountFromRepo = await _repo.GetAccount(id);
+                
+            _mapper.Map(accountForUpdate, accountFromRepo);
 
             try
             {

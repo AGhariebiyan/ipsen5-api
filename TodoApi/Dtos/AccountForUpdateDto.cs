@@ -4,9 +4,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GMAPI.Models
+namespace GMAPI.Dtos
 {
-    public class Account
+    public class AccountForUpdateDto
     {
         public Guid Id { get; set; }
         [Required]
@@ -14,6 +14,7 @@ namespace GMAPI.Models
         [Required]
         public String LastName { get; set; }
         public String MiddleName { get; set; }
+        
         [Required]
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
         public String Email { get; set; }
@@ -24,20 +25,5 @@ namespace GMAPI.Models
         public String LinkedInUrl { get; set; }
         public String TwitterUrl { get; set; }
         public String InstagramUrl { get; set; }
-
-        public Image Image { get; set; }
-
-
-
-        public byte[] PasswordHash { get; set; }
-
-        public byte[] PasswordSalt { get; set; }
-
-        
-        public PermissionRole Role { get; set; }
-
-        public Guid? RoleId { get; set; }
-
-
     }
 }
