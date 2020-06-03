@@ -32,7 +32,7 @@ namespace GMAPI.Controllers
 
         public AccountsController(IMapper mapper, PostgresDatabaseContext context, IWebHostEnvironment environment, IAccountRepository repo)
         {
-            _accountRepo = accountRepository;
+            _repo = repo;
             _context = context;
             _mapper = mapper;
             _hostingEnvironment = environment;
@@ -129,7 +129,7 @@ namespace GMAPI.Controllers
         [HttpPut("{id}/Image")]
         public async Task<ActionResult> SetImage(Guid id, Image image)
         {
-            var account = _accountRepo.GetAccount(id).Result;
+            var account = _repo.GetAccount(id).Result;
             account.Image = image;
             var changes = await _context.SaveChangesAsync();
             if (changes == 0)
