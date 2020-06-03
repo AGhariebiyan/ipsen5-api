@@ -9,5 +9,6 @@ namespace GMAPI.Data
     public interface IAccountRepository
     {
         Task<Account> GetFullAccount(Guid id);
+        Task<Account> GetAccount(Guid id);
     }
 }

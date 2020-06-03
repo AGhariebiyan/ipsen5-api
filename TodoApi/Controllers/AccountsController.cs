@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.FileProviders;
 using System.Security.Claims;
+using GMAPI.Data;
 
 namespace GMAPI.Controllers
 {
@@ -26,13 +27,15 @@ namespace GMAPI.Controllers
     {
         private readonly PostgresDatabaseContext _context;
         private readonly IMapper _mapper;
-        private IWebHostEnvironment _hostingEnvironment;
+        private readonly IAccountRepository _accountRepo;
 
-        public AccountsController(IMapper mapper, PostgresDatabaseContext context, IWebHostEnvironment environment)
+
+        public AccountsController(IMapper mapper, PostgresDatabaseContext context, IAccountRepository accountRepository)
         {
+            _accountRepo = accountRepository;
             _context = context;
             _mapper = mapper;
-            _hostingEnvironment = environment;
+
         }
 
         // GET: api/Accounts
@@ -120,29 +123,23 @@ namespace GMAPI.Controllers
             return account;
         }
 
-        [HttpPost("{id}/picture")]
-        public async Task<ActionResult<String>> SetPicture(Guid id, [FromForm] IFormFile picture)
+        [HttpPut("{id}/Image")]
+        public async Task<ActionResult> SetImage(Guid id, Image image)
         {
-            var existingFile = Directory.EnumerateFiles(_hostingEnvironment.ContentRootPath +"/Images/ProfilePictures").SingleOrDefault(f => f.Contains(id + "."));
-            if(existingFile != null) System.IO.File.Delete(existingFile);
-            var uploads = Path.Combine("Images/ProfilePictures", id + "." + picture.FileName.Split('.').Last());
-            using (var fileStream = new FileStream(uploads, FileMode.Create)) {
-                await picture.CopyToAsync(fileStream);
+            var account = _accountRepo.GetAccount(id).Result;
+            account.Image = image;
+            var changes = await _context.SaveChangesAsync();
+            if (changes == 0)
+            {
+                throw new Exception("something went wrong");
             }
-            return uploads;
-        }
-        
-        [HttpGet("{id}/picture")]
-        public async Task<ActionResult> GetPicture(Guid id)
-        {
-            var filename = Directory.EnumerateFiles(_hostingEnvironment.ContentRootPath +"/Images/ProfilePictures").SingleOrDefault(f => f.Contains(id + "."));
-            var file = PhysicalFile(filename, "image/jpeg");
-            return file;
+            return Ok();
         }
 
         private bool AccountExists(Guid id)
         {
             return _context.Accounts.Any(e => e.Id == id);
         }
+        
     }
 }
