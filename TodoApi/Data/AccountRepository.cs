@@ -16,10 +16,6 @@ namespace GMAPI.Data
             _context = context;
         }
 
-        public async Task<Account> GetAccount(Guid id)
-        {
-            return await _context.Accounts.FirstOrDefaultAsync(a => a.Id == id);
-        }
 
         public async Task<Account> GetFullAccount(Guid id)
         {
