@@ -22,7 +22,7 @@ namespace GMAPI.Models
         public String LinkedInUrl { get; set; }
         public String TwitterUrl { get; set; }
         public String InstagramUrl { get; set; }
-
+        public Boolean VerifiedEmail { get; set; }
         public Image Image { get; set; }
 
 

@@ -41,7 +41,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Images\ProfilePictures" />
+    <Folder Include="Images" />
   </ItemGroup>
 
   <ItemGroup>

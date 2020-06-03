@@ -5,11 +5,15 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Timers;
+using GMAPI.Other;
 
 namespace GMAPI.Data
 {
     public class AuthRepository : IAuthRepository
     {
+
+        
         private readonly PostgresDatabaseContext _context;
 
         public AuthRepository(PostgresDatabaseContext context)
@@ -28,7 +32,6 @@ namespace GMAPI.Data
             if (!VerfiyPasswordHash(password,  Account.PasswordHash, Account.PasswordSalt)) {
                 return null;
             }
-
             return Account;
 
         }
@@ -46,6 +49,7 @@ namespace GMAPI.Data
 
         public async Task<Account> Register(Account account, string password)
         {
+
             byte[] passwordHash, passwordSalt;
             CreatePasswordHash(password, out passwordHash, out passwordSalt);
 
@@ -70,6 +74,8 @@ namespace GMAPI.Data
             }
         }
 
+
+
         public async Task<bool> AccountExists(string Email)
         {
             if (await _context.Accounts.AnyAsync(x => x.Email == Email)){
@@ -77,5 +83,6 @@ namespace GMAPI.Data
             }
             return false;
         }
+        
     }
 }
