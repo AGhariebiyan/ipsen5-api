@@ -22,6 +22,7 @@ namespace GMAPI.Models
         public DbSet<Image> Image { get; set; }
         public DbSet<PermissionRole> PermissionRoles { get; set; }
         public DbSet<GMAPI.Models.Event> Event { get; set; }
+        public DbSet<Verification> Verifications { get; set; }
 
         public DbSet<GMAPI.Models.Participant> Participant { get; set; }
 
