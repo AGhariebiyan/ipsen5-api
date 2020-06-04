@@ -8,16 +8,7 @@
 
 
   <ItemGroup>
-    <Compile Remove="Migrations\20200527103204_changeParametersInNewspostModel.cs" />
-    <Compile Remove="Migrations\20200527103204_changeParametersInNewspostModel.Designer.cs" />
-    <Compile Remove="Migrations\20200527103801_test.cs" />
-    <Compile Remove="Migrations\20200527103801_test.Designer.cs" />
-    <Compile Remove="Migrations\20200527104054_test.cs" />
-    <Compile Remove="Migrations\20200527104054_test.Designer.cs" />
-    <Compile Remove="Migrations\20200527104642_test2.cs" />
-    <Compile Remove="Migrations\20200527104642_test2.Designer.cs" />
-    <Compile Remove="Migrations\20200527104734_test2.cs" />
-    <Compile Remove="Migrations\20200527104734_test2.Designer.cs" />
+
   </ItemGroup>
 
   <ItemGroup>
