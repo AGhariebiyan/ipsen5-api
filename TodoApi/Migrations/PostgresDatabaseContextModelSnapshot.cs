@@ -327,6 +327,22 @@ namespace GMAPI.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("GMAPI.Models.Verification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("AccountId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.ToTable("Verifications");
+                });
+
             modelBuilder.Entity("GMAPI.Models.WorksAt", b =>
                 {
                     b.Property<Guid>("Id")
@@ -417,6 +433,13 @@ namespace GMAPI.Migrations
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("GMAPI.Models.Verification", b =>
+                {
+                    b.HasOne("GMAPI.Models.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId");
                 });
 
             modelBuilder.Entity("GMAPI.Models.WorksAt", b =>

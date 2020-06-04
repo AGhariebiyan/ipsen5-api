@@ -18,6 +18,7 @@ using System.Timers;
 using AutoMapper;
 using GMAPI.Other;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
+using Newtonsoft.Json.Linq;
 
 namespace GMAPI.Controllers
 {
@@ -73,8 +74,11 @@ namespace GMAPI.Controllers
             var createdAccount = await _repo.Register(accountToCreate, accountForRegisterDto.Password);
 
             //Send verification Email
-            EmailService.CreateEmailVerificationInstance(createdAccount);
-
+            Guid verificationId = Guid.NewGuid();
+            var verification = new Verification {Id = verificationId, Account = createdAccount};
+            var verificationInstance = await _repo.CreateVerificationInstance(verification);
+            EmailService.SendVerificationEmail(createdAccount.Email, verificationId.ToString());
+            
             //Return 201 (created)
             return StatusCode(201);
         }
@@ -119,22 +123,29 @@ namespace GMAPI.Controllers
             return Ok(new {account = accountToReturn});
         }
 
+        [HttpGet("verifications")]
+
+        public async Task<ActionResult<IEnumerable<Verification>>> GetVerifications()
+        {
+            return await _repo.GetVerifications();
+        }
+
         [HttpGet("email/verify={verificationId}")]
 
-        public async Task<IActionResult> verifyEmail(Guid verificationId)
+        public async Task<IActionResult> VerifyEmail(Guid verificationId)
         {
-            if (!EmailService.verifications.TryGetValue(verificationId, out var userId))
+            var account = _repo.VerifyEmail(verificationId).Result;
+            if (account == null)
             {
-                return Ok("Link is expired please try to login again to recieve a new email");
+                return BadRequest("Link is expired");
             };
-            
-            var account = await _accountRepo.GetAccount(userId);
             account.VerifiedEmail = true;
 
             if (await _accountRepo.SaveAll()) {
                 return Ok("Email has been verified");
             }
             throw new Exception("Something went wrong");
+
 
         }
 
@@ -143,9 +154,13 @@ namespace GMAPI.Controllers
             var accountFromRepo = await _repo.Login(accountForLoginDto.Email.ToLower().Trim(), accountForLoginDto.Password);
 
             if (accountFromRepo == null) {
-                return Unauthorized();
+                return Unauthorized("wrong email or password");
             }
 
+            if (!accountFromRepo.VerifiedEmail)
+            {
+                return Unauthorized("email not verified");
+            }
            
             var claims = new List<Claim> {
                 new Claim(ClaimTypes.NameIdentifier, accountFromRepo.Id.ToString()),
@@ -154,9 +169,6 @@ namespace GMAPI.Controllers
             if (accountFromRepo.RoleId != null) {
                 claims.Add(new Claim(ClaimTypes.Role, accountFromRepo.Role.InternalName));
             };
-            
-
-           
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:Token").Value));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);

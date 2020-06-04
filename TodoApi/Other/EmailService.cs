@@ -30,7 +30,7 @@ namespace GMAPI.Other
             mail.Subject = "Email Verification";
             mail.SubjectEncoding = System.Text.Encoding.UTF8;
             mail.Body = "To verify that you registered please click this link:" + hostIp + "/api/auth/email/verify=" + verificationId +
-                "\n\nIf you did not register on our app then please ignore this email and the account will be removed from our server.";
+                "\nIf you did not register on our app then please ignore this email and the account will be removed from our server.";
             mail.BodyEncoding = System.Text.Encoding.UTF8;
             mail.IsBodyHtml = true;
             mail.Priority = MailPriority.High;
@@ -43,28 +43,6 @@ namespace GMAPI.Other
             {
                 
             }
-        }
-        
-        public static Dictionary<Guid, Guid> verifications = new Dictionary<Guid, Guid>();
-        
-
-        public static void CreateEmailVerificationInstance(Account user)
-        {
-            Guid verificationId = Guid.NewGuid();
-            verifications.Add(verificationId, user.Id);
-            Timer verificationTimer = new Timer(6000000);
-            verificationTimer.Elapsed += (sender, e) =>
-            {
-                RemoveVerificationInstance(verificationId);
-                verificationTimer.Dispose();
-            };
-            SendVerificationEmail(user.Email, verificationId.ToString());
-            verificationTimer.Enabled = true;
-        }
-
-        public static void RemoveVerificationInstance(Guid id)
-        {
-            verifications.Remove(id);
         }
     }
 }

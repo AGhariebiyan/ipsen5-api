@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using GMAPI.Other;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GMAPI.Data
 {
@@ -32,6 +33,7 @@ namespace GMAPI.Data
             if (!VerfiyPasswordHash(password,  Account.PasswordHash, Account.PasswordSalt)) {
                 return null;
             }
+
             return Account;
 
         }
@@ -60,10 +62,10 @@ namespace GMAPI.Data
 
             account.RoleId = nonMemberAccount.Id;
 
-            await _context.Accounts.AddAsync(account);
+            var createdAccount = await _context.Accounts.AddAsync(account);
             await _context.SaveChangesAsync();
 
-            return account;
+            return createdAccount.Entity;
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
@@ -83,6 +85,31 @@ namespace GMAPI.Data
             }
             return false;
         }
+
+        public async Task<Account> VerifyEmail(Guid verificationId)
+        {
+            var verification = await _context.Verifications.Include(v => v.Account).FirstOrDefaultAsync(x => x.Id == verificationId);
+            if (verification == null)
+            {
+                return null;
+            }
+
+            var account = verification.Account;
+            _context.Verifications.Remove(verification);
+            await _context.SaveChangesAsync();
+            return account;
+        }
+
+        public async Task<Verification> CreateVerificationInstance(Verification verification)
+        {
+            var ver = await _context.Verifications.AddAsync(verification);
+            await _context.SaveChangesAsync();
+            return ver.Entity;
+        }    
         
+        public async Task<ActionResult<IEnumerable<Verification>>> GetVerifications()
+        {
+            return await _context.Verifications.Include(v => v.Account).ToListAsync();
+        }    
     }
 }

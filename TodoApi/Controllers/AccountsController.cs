@@ -20,7 +20,6 @@ using GMAPI.Data;
 
 namespace GMAPI.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AccountsController : ControllerBase
