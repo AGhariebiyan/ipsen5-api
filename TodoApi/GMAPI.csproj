@@ -42,7 +42,6 @@
 
   <ItemGroup>
     <Folder Include="Images" />
-    <Folder Include="Images\" />
   </ItemGroup>
 
   <ItemGroup>
