@@ -13,7 +13,7 @@ namespace GMAPI.Dtos
         
         public String LastName { get; set; }
         public String MiddleName { get; set; }
-        
+        public Boolean VerifiedEmail { get; set; }
         public String Email { get; set; }
         public Boolean Active { get; set; }
         public String LinkedInUrl { get; set; }
