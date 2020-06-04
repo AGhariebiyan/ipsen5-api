@@ -18,7 +18,5 @@ namespace GMAPI.Models
         public Guid AccountId { get; set; }
         [ForeignKey("AccountId")]
         public virtual Account Account { get; set; }
-
-        public bool Featured { get; set; }
     }
 }
