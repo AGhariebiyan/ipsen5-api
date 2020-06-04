@@ -3,15 +3,17 @@ using System;
 using GMAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace GMAPI.Migrations
 {
     [DbContext(typeof(PostgresDatabaseContext))]
-    partial class PostgresDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20200603150058_AddedDescription")]
+    partial class AddedDescription
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -66,9 +68,6 @@ namespace GMAPI.Migrations
 
                     b.Property<string>("TwitterUrl")
                         .HasColumnType("text");
-
-                    b.Property<bool>("VerifiedEmail")
-                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
@@ -327,22 +326,6 @@ namespace GMAPI.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("GMAPI.Models.Verification", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("AccountId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AccountId");
-
-                    b.ToTable("Verifications");
-                });
-
             modelBuilder.Entity("GMAPI.Models.WorksAt", b =>
                 {
                     b.Property<Guid>("Id")
@@ -433,13 +416,6 @@ namespace GMAPI.Migrations
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("GMAPI.Models.Verification", b =>
-                {
-                    b.HasOne("GMAPI.Models.Account", "Account")
-                        .WithMany()
-                        .HasForeignKey("AccountId");
                 });
 
             modelBuilder.Entity("GMAPI.Models.WorksAt", b =>

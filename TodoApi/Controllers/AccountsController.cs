@@ -26,15 +26,16 @@ namespace GMAPI.Controllers
     {
         private readonly PostgresDatabaseContext _context;
         private readonly IMapper _mapper;
-        private readonly IAccountRepository _accountRepo;
+        private IWebHostEnvironment _hostingEnvironment;
+        private IAccountRepository _repo;
 
-
-        public AccountsController(IMapper mapper, PostgresDatabaseContext context, IAccountRepository accountRepository)
+        public AccountsController(IMapper mapper, PostgresDatabaseContext context, IWebHostEnvironment environment, IAccountRepository repo)
         {
-            _accountRepo = accountRepository;
+            _repo = repo;
             _context = context;
             _mapper = mapper;
-
+            _hostingEnvironment = environment;
+            _repo = repo;
         }
 
         // GET: api/Accounts
@@ -63,28 +64,31 @@ namespace GMAPI.Controllers
         {
             Guid id = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-            var account = await _context.Accounts.Include(a => a.Role).FirstOrDefaultAsync(a => a.Id == id);
+            var account = await _repo.GetFullAccount(id);
 
             if (account == null)
             {
                 return NotFound();
             }
+            var returnAccount = _mapper.Map<AccountForMeDto>(account);
 
-            return _mapper.Map<AccountForMeDto>(account);
+            return Ok(returnAccount);
         }
 
         // PUT: api/Accounts/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAccount(Guid id, Account account)
+        public async Task<IActionResult> PutAccount(Guid id, AccountForUpdateDto accountForUpdate)
         {
-            if (id != account.Id)
+            if (id != accountForUpdate.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(account).State = EntityState.Modified;
+            var accountFromRepo = await _repo.GetAccount(id);
+                
+            _mapper.Map(accountForUpdate, accountFromRepo);
 
             try
             {
@@ -125,7 +129,7 @@ namespace GMAPI.Controllers
         [HttpPut("{id}/Image")]
         public async Task<ActionResult> SetImage(Guid id, Image image)
         {
-            var account = _accountRepo.GetAccount(id).Result;
+            var account = _repo.GetAccount(id).Result;
             account.Image = image;
             var changes = await _context.SaveChangesAsync();
             if (changes == 0)

@@ -15,13 +15,20 @@ namespace GMAPI.Data
         {
             _context = context;
         }
-        public async Task<Account> GetFullAccount(Guid id)
-        {
-            return await _context.Accounts.Include(a => a.Role).FirstOrDefaultAsync(a => a.Id == id);
-        }
+
         public async Task<Account> GetAccount(Guid id)
         {
             return await _context.Accounts.FirstOrDefaultAsync(a => a.Id == id);
+        }
+
+        public async Task<Account> GetFullAccount(Guid id)
+        {
+            return await _context.Accounts.Include(a => a.Role).Include(a => a.Image).FirstOrDefaultAsync(a => a.Id == id);
+        }
+
+        public async  Task<bool> SaveAll()
+        {
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }

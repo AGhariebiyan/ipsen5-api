@@ -10,5 +10,6 @@ namespace GMAPI.Data
     {
         Task<Account> GetFullAccount(Guid id);
         Task<Account> GetAccount(Guid id);
+        Task<bool> SaveAll();
     }
 }

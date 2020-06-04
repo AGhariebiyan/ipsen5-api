@@ -21,5 +21,6 @@ namespace GMAPI.Dtos
         public String TwitterUrl { get; set; }
         public String InstagramUrl { get; set; }
         public PermissionRole Role { get; set; }
+        public ImageDto? Image { get; set; }
     }
 }

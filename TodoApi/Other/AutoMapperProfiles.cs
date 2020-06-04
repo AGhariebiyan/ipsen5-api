@@ -15,6 +15,8 @@ namespace GMAPI.Other
             CreateMap<RoleForCreateDto, PermissionRole>();
             CreateMap<Account, AccountDto>();
             CreateMap<Account, AccountForMeDto>();
+            CreateMap<AccountForUpdateDto, Account>();
+            CreateMap<Image, ImageDto>();
         }
         
     }

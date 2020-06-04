@@ -140,8 +140,12 @@ namespace GMAPI.Controllers
                 return BadRequest("Link is expired");
             };
             account.VerifiedEmail = true;
-            await _accounts.PutAccount(account.Id, account);
-            return Ok("Email has been verified");
+
+            if (await _accountRepo.SaveAll()) {
+                return Ok("Email has been verified");
+            }
+            throw new Exception("Something went wrong");
+
 
         }
 

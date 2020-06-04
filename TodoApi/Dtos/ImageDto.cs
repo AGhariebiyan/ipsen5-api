@@ -1,16 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc.Routing;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GMAPI.Models
+namespace GMAPI.Dtos
 {
-    public class Image
+    public class ImageDto
     {
         public Guid Id { get; set; }
-        public String Location { get; set; }
         public String Url { get; set; }
-
     }
 }
