@@ -3,15 +3,17 @@ using System;
 using GMAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace GMAPI.Migrations
 {
     [DbContext(typeof(PostgresDatabaseContext))]
-    partial class PostgresDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20200604095128_addedArticleModel")]
+    partial class addedArticleModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -27,9 +29,6 @@ namespace GMAPI.Migrations
 
                     b.Property<bool>("Active")
                         .HasColumnType("boolean");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -61,20 +60,12 @@ namespace GMAPI.Migrations
                     b.Property<byte[]>("PasswordSalt")
                         .HasColumnType("bytea");
 
-                    b.Property<Guid?>("RoleId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("TwitterUrl")
                         .HasColumnType("text");
-
-                    b.Property<bool>("VerifiedEmail")
-                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ImageId");
-
-                    b.HasIndex("RoleId");
 
                     b.ToTable("Accounts");
                 });
@@ -297,23 +288,6 @@ namespace GMAPI.Migrations
                     b.ToTable("Participant");
                 });
 
-            modelBuilder.Entity("GMAPI.Models.PermissionRole", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("DisplayName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("InternalName")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PermissionRoles");
-                });
-
             modelBuilder.Entity("GMAPI.Models.Role", b =>
                 {
                     b.Property<Guid>("Id")
@@ -355,22 +329,6 @@ namespace GMAPI.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("GMAPI.Models.Verification", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("AccountId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AccountId");
-
-                    b.ToTable("Verifications");
-                });
-
             modelBuilder.Entity("GMAPI.Models.WorksAt", b =>
                 {
                     b.Property<Guid>("Id")
@@ -402,10 +360,6 @@ namespace GMAPI.Migrations
                     b.HasOne("GMAPI.Models.Image", "Image")
                         .WithMany()
                         .HasForeignKey("ImageId");
-
-                    b.HasOne("GMAPI.Models.PermissionRole", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId");
                 });
 
             modelBuilder.Entity("GMAPI.Models.Article", b =>
@@ -468,15 +422,6 @@ namespace GMAPI.Migrations
                     b.HasOne("GMAPI.Models.Group", "Group")
                         .WithMany()
                         .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("GMAPI.Models.Verification", b =>
-                {
-                    b.HasOne("GMAPI.Models.Account", "Account")
-                        .WithMany()
-                        .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
