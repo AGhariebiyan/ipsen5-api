@@ -65,6 +65,7 @@ namespace GMAPI
             services.AddMvc().AddControllersAsServices();
             services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<ICompanyRepository, CompanyRepository>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {

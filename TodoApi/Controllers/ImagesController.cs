@@ -27,24 +27,27 @@ namespace GMAPI.Controllers
         private readonly IMapper _mapper;
         private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly IAccountRepository _accountRepo;
+        private readonly ICompanyRepository _companyRepo;
 
-        
-        public ImagesController(IMapper mapper, 
-            PostgresDatabaseContext context, 
+
+        public ImagesController(IMapper mapper,
+            PostgresDatabaseContext context,
             IWebHostEnvironment environment,
-            IAccountRepository accountRepo)
+            IAccountRepository accountRepo,
+            ICompanyRepository companyRepo)
         {
             _mapper = mapper;
             _context = context;
             _hostingEnvironment = environment;
             _accountRepo = accountRepo;
+            _companyRepo = companyRepo;
         }
 
         // api/Images/5
         [HttpGet("{id}")]
         public async Task<ActionResult> GetImageById(Guid id)
         {
-            var filename = Directory.EnumerateFiles(_hostingEnvironment.ContentRootPath +"/Images").SingleOrDefault(f => f.Contains(id + "."));
+            var filename = Directory.EnumerateFiles(_hostingEnvironment.ContentRootPath + "/Images").SingleOrDefault(f => f.Contains(id + "."));
             var file = PhysicalFile(filename, "image/jpeg");
             return file;
         }
@@ -98,6 +101,39 @@ namespace GMAPI.Controllers
             await _context.Image.AddAsync(image);
             await _context.SaveChangesAsync();
             return image;
+        }
+
+        [HttpPost("companies/{id}")] 
+        public async Task<IActionResult> setCompanyImage([FromRoute] Guid id, [FromForm] IFormFile picture) {
+
+            var companyToUpdate = await _companyRepo.GetCompany(id);
+
+            if (companyToUpdate == null)
+            {
+                return BadRequest("Company not found");
+            }
+
+            if (picture.Length > 800000)
+            {
+                return BadRequest("Image file too large");
+            }
+
+
+            var image = new Image();
+            image.Id = Guid.NewGuid();
+            var uploads = Path.Combine("Images", image.Id + "." + picture.FileName.Split('.').Last());
+            using (var fileStream = new FileStream(uploads, FileMode.Create))
+            {
+                await picture.CopyToAsync(fileStream);
+            }
+            image.Location = uploads;
+            image.Url = "api/Images/" + image.Id;
+
+            companyToUpdate.ImageId = image.Id;
+
+            await _context.Image.AddAsync(image);
+            await _context.SaveChangesAsync();
+            return Ok(image);
         }
 
         [HttpPost]
