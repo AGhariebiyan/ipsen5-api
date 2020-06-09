@@ -166,6 +166,11 @@ namespace GMAPI.Controllers
                 return BadRequest("User does not exist");
             }
 
+            
+            if (worksAt.Role != null) {
+                worksAt.Role.canEditCompany = true;
+            }
+
             worksAt.AccountId = id;
 
             userToUpdate.Jobs.Add(worksAt);
