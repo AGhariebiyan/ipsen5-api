@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.FileProviders;
 using System.Security.Claims;
 using GMAPI.Data;
+using Microsoft.AspNetCore.Connections.Features;
 
 namespace GMAPI.Controllers
 {
@@ -41,8 +42,13 @@ namespace GMAPI.Controllers
         // GET: api/Accounts
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AccountDto>>> GetAccounts()
-        { 
-            return await _context.Accounts.ProjectTo<AccountDto>(_mapper.ConfigurationProvider).ToListAsync();
+        {
+            var accountsFromRepo = await _context.Accounts
+                .Include(a => a.Jobs).ThenInclude(j => j.Role)
+                .Include(a => a.Jobs).ThenInclude(j => j.Company).ThenInclude(c => c.Image)
+                .ProjectTo<AccountDto>(_mapper.ConfigurationProvider).ToListAsync();
+            
+            return accountsFromRepo;
         }
 
         // GET: api/Accounts/5
@@ -143,6 +149,65 @@ namespace GMAPI.Controllers
         {
             return _context.Accounts.Any(e => e.Id == id);
         }
-        
+
+
+        [HttpPost("{id}/addjob")]
+        public async Task<IActionResult> AddJob(Guid id, WorksAtForCreateDto worksAtForCreate) {
+
+            var worksAt = _mapper.Map<WorksAt>(worksAtForCreate);
+            
+            Guid jwtId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            if (id != jwtId) {
+                return Unauthorized();
+            }
+
+            var userToUpdate = await _context.Accounts.Include(a => a.Jobs).FirstOrDefaultAsync(a => a.Id == id);
+            if (userToUpdate == null) {
+                return BadRequest("User does not exist");
+            }
+
+            worksAt.AccountId = id;
+
+            userToUpdate.Jobs.Add(worksAt);
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                return Ok();
+            }
+            else {
+                return BadRequest("Did not update");
+            }
+
+        }
+
+        [HttpDelete("{id}/removeJob/{jobId}")]
+        public async Task<IActionResult> RemoveJob(Guid id, Guid jobId)
+        {
+
+            Guid jwtId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            if (id != jwtId)
+            {
+                return Unauthorized();
+            }
+
+            var worksAtToRemove = await _context.WorksAt.FirstOrDefaultAsync(wa => wa.Id == jobId);
+            if (worksAtToRemove == null)
+            {
+                return BadRequest("You are not working for this company");
+            }
+
+            _context.WorksAt.Remove(worksAtToRemove);
+
+          
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest("Did not update");
+            }
+
+        }
+
     }
 }

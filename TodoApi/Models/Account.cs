@@ -32,6 +32,8 @@ namespace GMAPI.Models
         public Guid? ImageId { get; set; }
 
 
+        public ICollection<WorksAt> Jobs { get; set; }
+
 
         public byte[] PasswordHash { get; set; }
 
