@@ -17,6 +17,7 @@ namespace GMAPI.Other
             CreateMap<Account, AccountForMeDto>();
             CreateMap<AccountForUpdateDto, Account>();
             CreateMap<Image, ImageDto>();
+            CreateMap<Company, CompanyForReturnDto>();
         }
         
     }

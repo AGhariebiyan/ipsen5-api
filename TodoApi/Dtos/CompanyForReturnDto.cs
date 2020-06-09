@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GMAPI.Models
+namespace GMAPI.Dtos
 {
-    public class Company
+    public class CompanyForReturnDto
     {
         public Guid Id { get; set; }
-        [Required]
+
         public String Name { get; set; }
         public String Address { get; set; }
         public Boolean Active { get; set; }
+
+        public ImageDto Image { get; set; }
         
-        public Image? Image { get; set; }
-        public Guid? ImageId { get; set; }
     }
 }
