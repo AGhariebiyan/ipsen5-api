@@ -104,7 +104,7 @@ namespace GMAPI.Controllers
         }
 
         [HttpPost("companies/{id}")] 
-        public async Task<IActionResult> setCompanyImage([FromRoute] Guid id, [FromForm] IFormFile picture) {
+        public async Task<IActionResult> SetCompanyImage([FromRoute] Guid id, [FromForm] IFormFile picture) {
 
             var companyToUpdate = await _companyRepo.GetCompany(id);
 
@@ -133,7 +133,10 @@ namespace GMAPI.Controllers
 
             await _context.Image.AddAsync(image);
             await _context.SaveChangesAsync();
-            return Ok(image);
+
+            var imageForReturn = _mapper.Map<ImageDto>(image);
+            
+            return Ok(imageForReturn);
         }
 
         [HttpPost]

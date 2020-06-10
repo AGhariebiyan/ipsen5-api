@@ -18,6 +18,10 @@ namespace GMAPI.Other
             CreateMap<AccountForUpdateDto, Account>();
             CreateMap<Image, ImageDto>();
             CreateMap<Company, CompanyForReturnDto>();
+            CreateMap<WorksAt, WorksAtForReturnDto>();
+            CreateMap<WorksAtForCreateDto, WorksAt>();
+            CreateMap<WorksAtForUpdateDto, WorksAt>();
+            CreateMap<RoleForUpdateDto, Role>();
         }
         
     }
