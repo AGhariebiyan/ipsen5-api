@@ -151,7 +151,7 @@ namespace GMAPI.Controllers
         }
 
 
-        [HttpPost("{id}/addjob")]
+        [HttpPost("{id}/jobs")]
         public async Task<IActionResult> AddJob(Guid id, WorksAtForCreateDto worksAtForCreate) {
 
             var worksAt = _mapper.Map<WorksAt>(worksAtForCreate);
@@ -181,10 +181,34 @@ namespace GMAPI.Controllers
             else {
                 return BadRequest("Did not update");
             }
+        }
+        [HttpPut("{id}/jobs/{jobId}")]
+        public async Task<IActionResult> UpdateJobDescription(Guid jobId, WorksAtForUpdateDto worksAtForUpdate) {
+            var worksAt = _mapper.Map<WorksAt>(worksAtForUpdate);
 
+            var jobFromRepo = await _context.WorksAt
+                .Include(a => a.Account)
+                .Include(a => a.Role)
+                .Include(a => a.Company)
+                .FirstOrDefaultAsync(w => w.Id == jobId);
+
+            Guid jwtId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            if (jobFromRepo.AccountId != jwtId) {
+                return Unauthorized();
+            }
+            jobFromRepo.Role.Title = worksAt.Role.Title;
+
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                return Ok();
+            }
+            else {
+                return BadRequest("Could not update the job");
+            }
         }
 
-        [HttpDelete("{id}/removeJob/{jobId}")]
+        [HttpDelete("{id}/jobs/{jobId}")]
         public async Task<IActionResult> RemoveJob(Guid id, Guid jobId)
         {
 

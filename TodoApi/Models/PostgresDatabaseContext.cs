@@ -28,6 +28,8 @@ namespace GMAPI.Models
 
         public DbSet<GMAPI.Models.News> News { get; set; }
 
+        public DbSet<Role> Role { get; set; }
+
         public DbSet<Article> Article { get; set; }
 
     }

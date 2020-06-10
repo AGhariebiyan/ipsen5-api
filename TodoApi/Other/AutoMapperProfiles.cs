@@ -20,6 +20,8 @@ namespace GMAPI.Other
             CreateMap<Company, CompanyForReturnDto>();
             CreateMap<WorksAt, WorksAtForReturnDto>();
             CreateMap<WorksAtForCreateDto, WorksAt>();
+            CreateMap<WorksAtForUpdateDto, WorksAt>();
+            CreateMap<RoleForUpdateDto, Role>();
         }
         
     }
