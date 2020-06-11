@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GMAPI.Models;
+using Microsoft.Extensions.Logging;
 
 namespace GMAPI.Controllers
 {
@@ -27,11 +28,30 @@ namespace GMAPI.Controllers
             return await _context.Participant.ToListAsync();
         }
 
+        [HttpGet("getForEvent/{eventId}")]
+        public async Task<ActionResult<IEnumerable<Participant>>> GetParticipantsForEvent(Guid eventId)
+        {
+           return await _context.Participant.Where(x => x.EventId == eventId).ToListAsync();
+        }
+
         // GET: api/Participants/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Participant>> GetParticipant(Guid id)
         {
             var participant = await _context.Participant.FindAsync(id);
+
+            if (participant == null)
+            {
+                return NotFound();
+            }
+
+            return participant;
+        }
+
+        [HttpGet("thisParticipant/{eventId}/{accountId}")]
+        public async Task<ActionResult<Participant>> GetThisParticipant(Guid eventId, Guid accountId)
+        {
+            var participant = await _context.Participant.Where(x => x.EventId == eventId && x.AccountId == accountId).FirstAsync();
 
             if (participant == null)
             {
@@ -101,9 +121,27 @@ namespace GMAPI.Controllers
             return participant;
         }
 
+        [HttpDelete("deleteThisParticipant/{eventId}/{accountId}")]
+        public async Task<ActionResult<Participant>> DeleteByEventAndAccount(Guid eventId, Guid accountId)
+        {
+            var participant = await _context.Participant.Where(x => x.EventId == eventId && x.AccountId == accountId).FirstAsync();
+
+            if (participant == null)
+            {
+                return NotFound();
+            }
+
+            _context.Participant.Remove(participant);
+            await _context.SaveChangesAsync();
+
+            return participant;
+        }
+
         private bool ParticipantExists(Guid id)
         {
             return _context.Participant.Any(e => e.Id == id);
         }
+
     }
+
 }

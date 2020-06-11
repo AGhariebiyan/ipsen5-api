@@ -12,6 +12,7 @@ namespace GMAPI.Other
         
         //Er is nog geen globale ip adress dus je kan hem hier instellen
         private static String hostIp = "80.112.188.42:5000";
+
         static SmtpClient client = new SmtpClient();
 
         public static void SetupEmail()
