@@ -31,7 +31,7 @@ namespace GMAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Event>> GetEvent(Guid id)
         {
-            var @event = await _context.Event.Include(x => x.Participants).FindAsync(id);
+            var @event = await _context.Event.Include(x => x.Participants).Where(x=> x.Id == id).FirstAsync();
 
             if (@event == null)
             {
