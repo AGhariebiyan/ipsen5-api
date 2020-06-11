@@ -54,7 +54,10 @@ namespace GMAPI
             });
             /*services.AddDbContext<TodoContext>(opt =>
             opt.UseInMemoryDatabase("TodoList"));*/
-            services.AddControllers();
+            //services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(opt => {
+                opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            });
             //services.AddAuthorization();
 
             services.Configure<ForwardedHeadersOptions>(options =>

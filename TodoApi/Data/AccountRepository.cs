@@ -23,7 +23,12 @@ namespace GMAPI.Data
 
         public async Task<Account> GetFullAccount(Guid id)
         {
-            return await _context.Accounts.Include(a => a.Role).Include(a => a.Image).FirstOrDefaultAsync(a => a.Id == id);
+            return await _context.Accounts
+                .Include(a => a.Role)
+                .Include(a => a.Image)
+                .Include(a => a.Jobs).ThenInclude(j => j.Company).ThenInclude(c => c.Image)
+                .Include(a => a.Jobs).ThenInclude(j => j.Role)
+                .FirstOrDefaultAsync(a => a.Id == id);
         }
 
         public async  Task<bool> SaveAll()

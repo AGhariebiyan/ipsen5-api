@@ -79,6 +79,34 @@ namespace GMAPI.Migrations
                     b.ToTable("Accounts");
                 });
 
+            modelBuilder.Entity("GMAPI.Models.Article", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("Published")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.ToTable("Article");
+                });
+
             modelBuilder.Entity("GMAPI.Models.Attended", b =>
                 {
                     b.Property<Guid>("Id")
@@ -299,6 +327,9 @@ namespace GMAPI.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("canEditCompany")
+                        .HasColumnType("boolean");
+
                     b.HasKey("Id");
 
                     b.ToTable("Role");
@@ -380,6 +411,15 @@ namespace GMAPI.Migrations
                         .HasForeignKey("RoleId");
                 });
 
+            modelBuilder.Entity("GMAPI.Models.Article", b =>
+                {
+                    b.HasOne("GMAPI.Models.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("GMAPI.Models.Attended", b =>
                 {
                     b.HasOne("GMAPI.Models.Account", "Account")
@@ -447,7 +487,7 @@ namespace GMAPI.Migrations
             modelBuilder.Entity("GMAPI.Models.WorksAt", b =>
                 {
                     b.HasOne("GMAPI.Models.Account", "Account")
-                        .WithMany()
+                        .WithMany("Jobs")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
