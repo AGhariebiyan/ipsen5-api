@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace GMAPI.Models
@@ -29,5 +30,6 @@ namespace GMAPI.Models
         public string EventLocationCountry { get; set; }
 
         public DateTime EventDate { get; set; }
+
     }
 }

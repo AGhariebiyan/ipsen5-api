@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GMAPI.Models;
+using Microsoft.Extensions.Logging;
 
 namespace GMAPI.Controllers
 {
@@ -25,6 +26,12 @@ namespace GMAPI.Controllers
         public async Task<ActionResult<IEnumerable<Participant>>> GetParticipant()
         {
             return await _context.Participant.ToListAsync();
+        }
+
+        [HttpGet("getForEvent/{eventId}")]
+        public async Task<ActionResult<IEnumerable<Participant>>> GetParticipantsForEvent(Guid eventId)
+        {
+           return await _context.Participant.Where(x => x.EventId == eventId).ToListAsync();
         }
 
         // GET: api/Participants/5
