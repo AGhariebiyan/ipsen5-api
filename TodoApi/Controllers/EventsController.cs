@@ -24,14 +24,14 @@ namespace GMAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Event>>> GetEvent()
         {
-            return await _context.Event.ToListAsync();
+            return await _context.Event.Include(x => x.Participants).ToListAsync();
         }
 
         // GET: api/Events/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Event>> GetEvent(Guid id)
         {
-            var @event = await _context.Event.FindAsync(id);
+            var @event = await _context.Event.Include(x => x.Participants).FindAsync(id);
 
             if (@event == null)
             {

@@ -31,5 +31,7 @@ namespace GMAPI.Models
 
         public DateTime EventDate { get; set; }
 
+        public virtual ICollection<Participant> Participants { get; set; }
+
     }
 }

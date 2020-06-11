@@ -121,9 +121,27 @@ namespace GMAPI.Controllers
             return participant;
         }
 
+        [HttpDelete("deleteThisParticipant/{eventId}/{accountId}")]
+        public async Task<ActionResult<Participant>> DeleteByEventAndAccount(Guid eventId, Guid accountId)
+        {
+            var participant = await _context.Participant.Where(x => x.EventId == eventId && x.AccountId == accountId).FirstAsync();
+
+            if (participant == null)
+            {
+                return NotFound();
+            }
+
+            _context.Participant.Remove(participant);
+            await _context.SaveChangesAsync();
+
+            return participant;
+        }
+
         private bool ParticipantExists(Guid id)
         {
             return _context.Participant.Any(e => e.Id == id);
         }
+
     }
+
 }
