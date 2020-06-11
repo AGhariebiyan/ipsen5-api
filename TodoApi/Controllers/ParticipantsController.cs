@@ -48,6 +48,19 @@ namespace GMAPI.Controllers
             return participant;
         }
 
+        [HttpGet("thisParticipant/{eventId}/{accountId}")]
+        public async Task<ActionResult<Participant>> GetThisParticipant(Guid eventId, Guid accountId)
+        {
+            var participant = await _context.Participant.Where(x => x.EventId == eventId && x.AccountId == accountId).FirstAsync();
+
+            if (participant == null)
+            {
+                return NotFound();
+            }
+
+            return participant;
+        }
+
         // PUT: api/Participants/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
