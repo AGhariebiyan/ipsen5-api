@@ -19,12 +19,18 @@ namespace GMAPI.Models
         public DbSet<WorksAt> WorksAt { get; set; }
         public DbSet<Attended> Attended { get; set; }
         public DbSet<FieldOfStudy> Studies { get; set; } 
-
+        public DbSet<Image> Image { get; set; }
+        public DbSet<PermissionRole> PermissionRoles { get; set; }
         public DbSet<GMAPI.Models.Event> Event { get; set; }
+        public DbSet<Verification> Verifications { get; set; }
 
         public DbSet<GMAPI.Models.Participant> Participant { get; set; }
 
         public DbSet<GMAPI.Models.News> News { get; set; }
+
+        public DbSet<Role> Role { get; set; }
+
+        public DbSet<Article> Article { get; set; }
 
     }
 }

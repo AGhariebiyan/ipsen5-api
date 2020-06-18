@@ -28,6 +28,9 @@ namespace GMAPI.Migrations
                     b.Property<bool>("Active")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("text");
@@ -58,14 +61,50 @@ namespace GMAPI.Migrations
                     b.Property<byte[]>("PasswordSalt")
                         .HasColumnType("bytea");
 
+                    b.Property<Guid?>("RoleId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("TwitterUrl")
                         .HasColumnType("text");
+
+                    b.Property<bool>("VerifiedEmail")
+                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ImageId");
 
+                    b.HasIndex("RoleId");
+
                     b.ToTable("Accounts");
+                });
+
+            modelBuilder.Entity("GMAPI.Models.Article", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("Published")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.ToTable("Article");
                 });
 
             modelBuilder.Entity("GMAPI.Models.Attended", b =>
@@ -258,6 +297,23 @@ namespace GMAPI.Migrations
                     b.ToTable("Participant");
                 });
 
+            modelBuilder.Entity("GMAPI.Models.PermissionRole", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("DisplayName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("InternalName")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PermissionRoles");
+                });
+
             modelBuilder.Entity("GMAPI.Models.Role", b =>
                 {
                     b.Property<Guid>("Id")
@@ -270,6 +326,9 @@ namespace GMAPI.Migrations
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("canEditCompany")
+                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
@@ -297,6 +356,22 @@ namespace GMAPI.Migrations
                     b.HasIndex("GroupId");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("GMAPI.Models.Verification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.ToTable("Verifications");
                 });
 
             modelBuilder.Entity("GMAPI.Models.WorksAt", b =>
@@ -330,6 +405,19 @@ namespace GMAPI.Migrations
                     b.HasOne("GMAPI.Models.Image", "Image")
                         .WithMany()
                         .HasForeignKey("ImageId");
+
+                    b.HasOne("GMAPI.Models.PermissionRole", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId");
+                });
+
+            modelBuilder.Entity("GMAPI.Models.Article", b =>
+                {
+                    b.HasOne("GMAPI.Models.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("GMAPI.Models.Attended", b =>
@@ -387,10 +475,19 @@ namespace GMAPI.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("GMAPI.Models.WorksAt", b =>
+            modelBuilder.Entity("GMAPI.Models.Verification", b =>
                 {
                     b.HasOne("GMAPI.Models.Account", "Account")
                         .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GMAPI.Models.WorksAt", b =>
+                {
+                    b.HasOne("GMAPI.Models.Account", "Account")
+                        .WithMany("Jobs")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

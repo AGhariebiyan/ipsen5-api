@@ -11,5 +11,6 @@ namespace GMAPI.Models
         public Guid Id { get; set; }
         public String Location { get; set; }
         public String Url { get; set; }
+
     }
 }

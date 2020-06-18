@@ -9,12 +9,14 @@ namespace GMAPI.Models
     public class WorksAt
     {
         public Guid Id { get; set; }
-        [Required]
+
         public Account Account { get; set; }
-        [Required]
+        public Guid AccountId { get; set; }
         public Company Company { get; set; }
+        public Guid CompanyId { get; set; }
         [Required]
         public Role Role { get; set; }
+        public Guid RoleId { get; set; }
 
     }
 }

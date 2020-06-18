@@ -43,7 +43,7 @@ namespace GMAPI
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddAutoMapper(typeof(AccountProfile));
+            services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
 
             var dbConfig = 
 
@@ -54,7 +54,10 @@ namespace GMAPI
             });
             /*services.AddDbContext<TodoContext>(opt =>
             opt.UseInMemoryDatabase("TodoList"));*/
-            services.AddControllers();
+            //services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(opt => {
+                opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            });
             //services.AddAuthorization();
 
             services.Configure<ForwardedHeadersOptions>(options =>
@@ -64,6 +67,8 @@ namespace GMAPI
 
             services.AddMvc().AddControllersAsServices();
             services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<ICompanyRepository, CompanyRepository>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -76,7 +81,12 @@ namespace GMAPI
                     };
                 });
 
-            
+            EmailService.SetupEmail();
+
+            services.AddControllersWithViews().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

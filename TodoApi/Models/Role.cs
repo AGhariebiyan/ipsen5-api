@@ -12,6 +12,8 @@ namespace GMAPI.Models
         [Required]
         public String Title { get; set; }
         public String Description { get; set; }
+        
+        public Boolean canEditCompany { get; set; }
 
     }
 }

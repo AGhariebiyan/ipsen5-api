@@ -13,6 +13,12 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyModel;
+using System.Collections.Generic;
+using System.Timers;
+using AutoMapper;
+using GMAPI.Other;
+using Microsoft.AspNetCore.Mvc.ActionConstraints;
+using Newtonsoft.Json.Linq;
 
 namespace GMAPI.Controllers
 {
@@ -21,14 +27,23 @@ namespace GMAPI.Controllers
     public class AuthController : ControllerBase
     {
 
+        
         private readonly IAuthRepository _repo;
         private readonly IConfiguration _config;
         private readonly AccountsController _accounts;
+        private readonly IAccountRepository _accountRepo;
+        private readonly IMapper _mapper;
 
-        public AuthController(IAuthRepository repo, IConfiguration config, AccountsController accountsController) {
+        public AuthController(IAuthRepository repo, 
+            IConfiguration config, 
+            AccountsController accountsController,
+            IAccountRepository accountRepo,
+            IMapper mapper) {
             _repo = repo;
             _config = config;
             _accounts = accountsController;
+            _accountRepo = accountRepo;
+            _mapper = mapper;
         }
 
         [HttpPost("register")]
@@ -52,10 +67,18 @@ namespace GMAPI.Controllers
                 MiddleName = accountForRegisterDto.MiddleName
             };
 
+           
+
+
             //Create the account
             var createdAccount = await _repo.Register(accountToCreate, accountForRegisterDto.Password);
 
-
+            //Send verification Email
+            Guid verificationId = Guid.NewGuid();
+            var verification = new Verification {Id = verificationId, Account = createdAccount};
+            await _repo.CreateVerificationInstance(verification);
+            EmailService.SendVerificationEmail(createdAccount.Email, verificationId.ToString());
+            
             //Return 201 (created)
             return StatusCode(201);
         }
@@ -91,10 +114,39 @@ namespace GMAPI.Controllers
 
             var decodedToken = tokenHandler.ReadJwtToken(jwtToken);
             var id = decodedToken.Claims.First(claim => claim.Type == "nameid").Value;
-            var userAccount = _accounts.GetAccount(Guid.Parse(id)).Result.Value;
             
+            //var userAccount = _accounts.GetMyAccount().Result.Value
+            var userAccount = await _accountRepo.GetFullAccount(Guid.Parse(id));
+
+            var accountToReturn = _mapper.Map<AccountForMeDto>(userAccount);
             //... manual validations return false if anything untoward is discovered
-            return Ok(new {account = userAccount});
+            return Ok(new {account = accountToReturn});
+        }
+
+        [HttpGet("verifications")]
+
+        public async Task<ActionResult<IEnumerable<Verification>>> GetVerifications()
+        {
+            return await _repo.GetVerifications();
+        }
+
+        [HttpGet("email/verify={verificationId}")]
+
+        public async Task<IActionResult> VerifyEmail(Guid verificationId)
+        {
+            var account = _repo.VerifyEmail(verificationId).Result;
+            if (account == null)
+            {
+                return BadRequest("Link is expired");
+            };
+            account.VerifiedEmail = true;
+
+            if (await _accountRepo.SaveAll()) {
+                return Ok("Email has been verified");
+            }
+            throw new Exception("Something went wrong");
+
+
         }
 
         [HttpPost("login")]
@@ -102,12 +154,20 @@ namespace GMAPI.Controllers
             var accountFromRepo = await _repo.Login(accountForLoginDto.Email.ToLower().Trim(), accountForLoginDto.Password);
 
             if (accountFromRepo == null) {
-                return Unauthorized();
+                return Unauthorized("wrong email or password");
             }
 
-            var claims = new[] {
+            if (!accountFromRepo.VerifiedEmail)
+            {
+                return Unauthorized("email not verified");
+            }
+           
+            var claims = new List<Claim> {
                 new Claim(ClaimTypes.NameIdentifier, accountFromRepo.Id.ToString()),
                 new Claim(ClaimTypes.Email,  accountFromRepo.Email)
+            };
+            if (accountFromRepo.RoleId != null) {
+                claims.Add(new Claim(ClaimTypes.Role, accountFromRepo.Role.InternalName));
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:Token").Value));
@@ -130,5 +190,7 @@ namespace GMAPI.Controllers
             });
                
         }
+        
+
     }
 }

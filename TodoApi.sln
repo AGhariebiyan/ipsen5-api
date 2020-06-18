@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.29920.165
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GMAPI", "TodoApi\GMAPI.csproj", "{7703053E-B39D-4835-89AF-95FD8EBACF27}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GMAPI.IntergrationTests", "IpsenApiTesting\GMAPI.IntergrationTests.csproj", "{28B26428-BB23-41D9-B415-CD456B359E96}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GMAPI.UnitTests", "GMAPI.UnitTests\GMAPI.UnitTests.csproj", "{0145FADC-1FE4-4EC3-A334-11847E0F3422}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{7703053E-B39D-4835-89AF-95FD8EBACF27}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7703053E-B39D-4835-89AF-95FD8EBACF27}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7703053E-B39D-4835-89AF-95FD8EBACF27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28B26428-BB23-41D9-B415-CD456B359E96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28B26428-BB23-41D9-B415-CD456B359E96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28B26428-BB23-41D9-B415-CD456B359E96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28B26428-BB23-41D9-B415-CD456B359E96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0145FADC-1FE4-4EC3-A334-11847E0F3422}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0145FADC-1FE4-4EC3-A334-11847E0F3422}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0145FADC-1FE4-4EC3-A334-11847E0F3422}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0145FADC-1FE4-4EC3-A334-11847E0F3422}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -15,10 +15,13 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.FileProviders;
+using System.Security.Claims;
+using GMAPI.Data;
+using GMAPI.Other;
+using Microsoft.AspNetCore.Connections.Features;
 
 namespace GMAPI.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AccountsController : ControllerBase
@@ -26,26 +29,34 @@ namespace GMAPI.Controllers
         private readonly PostgresDatabaseContext _context;
         private readonly IMapper _mapper;
         private IWebHostEnvironment _hostingEnvironment;
+        private IAccountRepository _repo;
 
-        public AccountsController(IMapper mapper, PostgresDatabaseContext context, IWebHostEnvironment environment)
+        public AccountsController(IMapper mapper, PostgresDatabaseContext context, IWebHostEnvironment environment, IAccountRepository repo)
         {
+            _repo = repo;
             _context = context;
             _mapper = mapper;
             _hostingEnvironment = environment;
+            _repo = repo;
         }
 
         // GET: api/Accounts
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AccountDto>>> GetAccounts()
-        { 
-            return await _context.Accounts.ProjectTo<AccountDto>(_mapper.ConfigurationProvider).ToListAsync();
+        {
+            var accountsFromRepo = await _context.Accounts
+                .Include(a => a.Jobs).ThenInclude(j => j.Role)
+                .Include(a => a.Jobs).ThenInclude(j => j.Company).ThenInclude(c => c.Image)
+                .ProjectTo<AccountDto>(_mapper.ConfigurationProvider).ToListAsync();
+            
+            return accountsFromRepo;
         }
 
         // GET: api/Accounts/5
         [HttpGet("{id}")]
         public async Task<ActionResult<AccountDto>> GetAccount(Guid id)
         {
-            var account = await _context.Accounts.FindAsync(id);
+            var account = await _context.Accounts.Include(a => a.Image).FirstOrDefaultAsync(a => a.Id == id);
 
             if (account == null)
             {
@@ -55,18 +66,36 @@ namespace GMAPI.Controllers
             return _mapper.Map<AccountDto>(account);
         }
 
+        [HttpGet("me")]
+        public async Task<ActionResult<AccountForMeDto>> GetMyAccount()
+        {
+            Guid id = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            var account = await _repo.GetFullAccount(id);
+
+            if (account == null)
+            {
+                return NotFound();
+            }
+            var returnAccount = _mapper.Map<AccountForMeDto>(account);
+
+            return Ok(returnAccount);
+        }
+
         // PUT: api/Accounts/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAccount(Guid id, Account account)
+        public async Task<IActionResult> PutAccount(Guid id, AccountForUpdateDto accountForUpdate)
         {
-            if (id != account.Id)
+            if (id != accountForUpdate.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(account).State = EntityState.Modified;
+            var accountFromRepo = await _repo.GetAccount(id);
+                
+            _mapper.Map(accountForUpdate, accountFromRepo);
 
             try
             {
@@ -104,29 +133,130 @@ namespace GMAPI.Controllers
             return account;
         }
 
-        [HttpPost("{id}/picture")]
-        public async Task<ActionResult<String>> SetPicture(Guid id, [FromForm] IFormFile picture)
+        // PUT: api/Accounts/5/password
+        [HttpPut("{id}/password")]
+        public async Task<ActionResult<AccountDto>> ChangePassword(Guid id, String password)
         {
-            var existingFile = Directory.EnumerateFiles(_hostingEnvironment.ContentRootPath +"/Images/ProfilePictures").SingleOrDefault(f => f.Contains(id + "."));
-            if(existingFile != null) System.IO.File.Delete(existingFile);
-            var uploads = Path.Combine("Images/ProfilePictures", id + "." + picture.FileName.Split('.').Last());
-            using (var fileStream = new FileStream(uploads, FileMode.Create)) {
-                await picture.CopyToAsync(fileStream);
+            var account = await _context.Accounts.FindAsync(id);
+            if (account == null)
+            {
+                return NotFound();
             }
-            return uploads;
+
+            PasswordService.CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
+
+            account.PasswordHash = passwordHash;
+            account.PasswordSalt = passwordSalt;
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<AccountDto>(account);;
         }
-        
-        [HttpGet("{id}/picture")]
-        public async Task<ActionResult> GetPicture(Guid id)
+
+        [HttpPut("{id}/Image")]
+        public async Task<ActionResult> SetImage(Guid id, Image image)
         {
-            var filename = Directory.EnumerateFiles(_hostingEnvironment.ContentRootPath +"/Images/ProfilePictures").SingleOrDefault(f => f.Contains(id + "."));
-            var file = PhysicalFile(filename, "image/jpeg");
-            return file;
+            var account = _repo.GetAccount(id).Result;
+            account.Image = image;
+            var changes = await _context.SaveChangesAsync();
+            if (changes == 0)
+            {
+                throw new Exception("something went wrong");
+            }
+            return Ok();
         }
 
         private bool AccountExists(Guid id)
         {
             return _context.Accounts.Any(e => e.Id == id);
         }
+
+
+        [HttpPost("{id}/jobs")]
+        public async Task<IActionResult> AddJob(Guid id, WorksAtForCreateDto worksAtForCreate) {
+
+            var worksAt = _mapper.Map<WorksAt>(worksAtForCreate);
+            
+            Guid jwtId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            if (id != jwtId) {
+                return Unauthorized();
+            }
+
+            var userToUpdate = await _context.Accounts.Include(a => a.Jobs).FirstOrDefaultAsync(a => a.Id == id);
+            if (userToUpdate == null) {
+                return BadRequest("User does not exist");
+            }
+
+            
+            if (worksAt.Role != null) {
+                worksAt.Role.canEditCompany = true;
+            }
+
+            worksAt.AccountId = id;
+
+            userToUpdate.Jobs.Add(worksAt);
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                return Ok();
+            }
+            else {
+                return BadRequest("Did not update");
+            }
+        }
+        [HttpPut("{id}/jobs/{jobId}")]
+        public async Task<IActionResult> UpdateJobDescription(Guid jobId, WorksAtForUpdateDto worksAtForUpdate) {
+            var worksAt = _mapper.Map<WorksAt>(worksAtForUpdate);
+
+            var jobFromRepo = await _context.WorksAt
+                .Include(a => a.Account)
+                .Include(a => a.Role)
+                .Include(a => a.Company)
+                .FirstOrDefaultAsync(w => w.Id == jobId);
+
+            Guid jwtId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            if (jobFromRepo.AccountId != jwtId) {
+                return Unauthorized();
+            }
+            jobFromRepo.Role.Title = worksAt.Role.Title;
+
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                return Ok();
+            }
+            else {
+                return BadRequest("Could not update the job");
+            }
+        }
+
+        [HttpDelete("{id}/jobs/{jobId}")]
+        public async Task<IActionResult> RemoveJob(Guid id, Guid jobId)
+        {
+
+            Guid jwtId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            if (id != jwtId)
+            {
+                return Unauthorized();
+            }
+
+            var worksAtToRemove = await _context.WorksAt.FirstOrDefaultAsync(wa => wa.Id == jobId);
+            if (worksAtToRemove == null)
+            {
+                return BadRequest("You are not working for this company");
+            }
+
+            _context.WorksAt.Remove(worksAtToRemove);
+
+          
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest("Did not update");
+            }
+
+        }
+
     }
 }

@@ -14,6 +14,7 @@ namespace GMAPI.Models
         public String Address { get; set; }
         public Boolean Active { get; set; }
         
-        public Image Image { get; set; }
+        public Image? Image { get; set; }
+        public Guid? ImageId { get; set; }
     }
 }
