@@ -40,6 +40,25 @@ namespace GMAPI.Controllers
 
             return article;
         }
+        
+        // GET: api/Article/user/5
+        [HttpGet("user/{id}")]
+        public async Task<ActionResult<IEnumerable<Article>>> GetArticleByUser(Guid id)
+        {
+            var articles = await _context.Article.ToListAsync();
+            var filteredArticles = articles.FindAll(
+                delegate(Article a)
+                {
+                    return a.AccountId.Equals(id);
+                });
+
+            if (filteredArticles.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return filteredArticles;
+        }
 
         // PUT: api/Article/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
