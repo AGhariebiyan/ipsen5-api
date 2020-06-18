@@ -2,7 +2,7 @@
 
 namespace GMAPI.Migrations
 {
-    public partial class addedverified : Migration
+    public partial class addedFieldEmail : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
