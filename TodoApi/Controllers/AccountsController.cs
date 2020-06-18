@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.FileProviders;
 using System.Security.Claims;
 using GMAPI.Data;
+using GMAPI.Other;
 using Microsoft.AspNetCore.Connections.Features;
 
 namespace GMAPI.Controllers
@@ -130,6 +131,25 @@ namespace GMAPI.Controllers
             await _context.SaveChangesAsync();
 
             return account;
+        }
+
+        // PUT: api/Accounts/5/password
+        [HttpPut("{id}/password")]
+        public async Task<ActionResult<AccountDto>> ChangePassword(Guid id, String password)
+        {
+            var account = await _context.Accounts.FindAsync(id);
+            if (account == null)
+            {
+                return NotFound();
+            }
+
+            PasswordService.CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
+
+            account.PasswordHash = passwordHash;
+            account.PasswordSalt = passwordSalt;
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<AccountDto>(account);;
         }
 
         [HttpPut("{id}/Image")]

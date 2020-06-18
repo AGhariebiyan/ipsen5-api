@@ -29,8 +29,9 @@ namespace GMAPI.Data
             if (Account == null) {
                 return null;
             }
-
-            if (!VerfiyPasswordHash(password,  Account.PasswordHash, Account.PasswordSalt)) {
+            
+            //Refactored to static PasswordService class - Yoran
+            if (!PasswordService.VerfiyPasswordHash(password,  Account.PasswordHash, Account.PasswordSalt)) {
                 return null;
             }
 
@@ -38,22 +39,12 @@ namespace GMAPI.Data
 
         }
 
-        private bool VerfiyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
-        {
-            using (var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt)) {
-                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                for (int i = 0; i < computedHash.Length; i++) {
-                    if (computedHash[i] != passwordHash[i]) return false;
-                }
-            }
-            return true;
-        }
-
         public async Task<Account> Register(Account account, string password)
         {
 
             byte[] passwordHash, passwordSalt;
-            CreatePasswordHash(password, out passwordHash, out passwordSalt);
+            //Refactored to static PasswordService class - Yoran
+            PasswordService.CreatePasswordHash(password, out passwordHash, out passwordSalt);
 
             account.PasswordHash = passwordHash;
             account.PasswordSalt = passwordSalt;
@@ -67,16 +58,6 @@ namespace GMAPI.Data
 
             return createdAccount.Entity;
         }
-
-        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-        {
-            using (var hmac = new System.Security.Cryptography.HMACSHA512()) {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-            }
-        }
-
-
 
         public async Task<bool> AccountExists(string Email)
         {
