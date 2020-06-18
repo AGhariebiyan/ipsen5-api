@@ -13,7 +13,7 @@ namespace GMAPI.Models
         public String Title { get; set; }
         public String Description { get; set; }
         
-        public Boolean canEditCompany { get; set; }
+        public Boolean CanEditCompany { get; set; }
 
     }
 }
