@@ -4,6 +4,7 @@ using System.Net.Mail;
 using System.Timers;
 using GMAPI.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
 
 namespace GMAPI.Other
 {
@@ -41,7 +42,7 @@ namespace GMAPI.Other
             }
             catch (Exception ex)
             {
-                
+                //TODO need exception handling
             }
         }
     }

@@ -76,7 +76,7 @@ namespace GMAPI.Controllers
             //Send verification Email
             Guid verificationId = Guid.NewGuid();
             var verification = new Verification {Id = verificationId, Account = createdAccount};
-            var verificationInstance = await _repo.CreateVerificationInstance(verification);
+            await _repo.CreateVerificationInstance(verification);
             EmailService.SendVerificationEmail(createdAccount.Email, verificationId.ToString());
             
             //Return 201 (created)
