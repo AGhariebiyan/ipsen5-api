@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using AutoMapper;
@@ -50,6 +51,30 @@ namespace GMAPI.Controllers
             var companyToCreate = await _repo.CreateCompany(comp);
             return Ok(companyToCreate);
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> EditCompany(Guid id, CompanyForUpdateDto companyForUpdateDto) {
+            Company company = await _repo.GetCompany(id);
+            Guid jwtId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            if (id != company.Id) {
+                return BadRequest("Id's do not match");
+            }
+            if (company == null) {
+                return BadRequest();
+            }
+
+            if (! await _repo.CanEditCompany(company.Id, jwtId)) {
+                return Unauthorized();
+            }
+            company = _mapper.Map(companyForUpdateDto, company);
+            Company updatedCompany = await _repo.UpdateCompany(company.Id, company);
+            if (updatedCompany != null) {
+                return Ok(_mapper.Map<CompanyForReturnDto>(company));
+            }
+            return BadRequest("SOmething went wrong updating the company");
+
+        }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCompany(Guid id) {

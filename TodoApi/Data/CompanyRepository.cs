@@ -20,6 +20,13 @@ namespace GMAPI.Data
             _mapper = mapper;
         }
 
+        public async Task<bool> CanEditCompany(Guid companyId, Guid accountId)
+        {
+            WorksAt worksAt = await _context.WorksAt.Include(wa => wa.Role).FirstOrDefaultAsync(wa =>
+                 wa.CompanyId == companyId && wa.AccountId == accountId && wa.Role.CanEditCompany == true);
+            return worksAt != null;
+        }
+
         public async Task<Company> CreateCompany(Company comp)
         {
             await _context.Companies.AddAsync(comp);
@@ -69,7 +76,7 @@ namespace GMAPI.Data
                 return null;
             }
 
-            var updatedCompany = _mapper.Map(company, companyFromRepo);
+            var updatedCompany = company;
 
             if (await SaveAll())
             {
