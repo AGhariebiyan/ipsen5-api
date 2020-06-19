@@ -36,13 +36,13 @@ namespace GMAPI.Data
 
         public async Task<bool> DeleteCompany(Guid id)
         {
-            var compFromDb = await _context.Companies.FirstOrDefaultAsync(c => c.Id == id);
+            var compFromDb = await _context.Companies.IgnoreQueryFilters().FirstOrDefaultAsync(c => c.Id == id);
             if (compFromDb == null)
             {
                 return false;
             }
             else {
-                _context.Companies.Remove(compFromDb);
+                compFromDb.Active = false;
                 return await SaveAll();
             }
         }
