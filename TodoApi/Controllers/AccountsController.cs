@@ -188,7 +188,7 @@ namespace GMAPI.Controllers
 
             
             if (worksAt.Role != null) {
-                worksAt.Role.canEditCompany = true;
+                worksAt.Role.CanEditCompany = true;
             }
 
             worksAt.AccountId = id;

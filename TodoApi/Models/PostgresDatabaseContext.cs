@@ -32,5 +32,12 @@ namespace GMAPI.Models
 
         public DbSet<Article> Article { get; set; }
 
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<Company>().HasQueryFilter(p => p.Active);
+        }
     }
 }

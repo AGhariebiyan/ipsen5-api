@@ -4,16 +4,13 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GMAPI.Models
+namespace GMAPI.Dtos
 {
-    public class Role
+    public class CompanyForUpdateDto
     {
+        [Required]
         public Guid Id { get; set; }
         [Required]
-        public String Title { get; set; }
-        public String Description { get; set; }
-        
-        public Boolean CanEditCompany { get; set; }
-
+        public String Name { get; set; }
     }
 }
