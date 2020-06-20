@@ -21,8 +21,8 @@ namespace GMAPI.Dtos
         public String TwitterUrl { get; set; }
         public String InstagramUrl { get; set; }
         public PermissionRole Role { get; set; }
+        public Boolean VerifiedEmail { get; set; }
         public ImageDto? Image { get; set; }
-
         public ICollection<WorksAtForReturnDto> Jobs { get; set; }
     }
 }
