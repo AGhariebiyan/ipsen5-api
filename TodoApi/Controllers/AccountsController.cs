@@ -39,6 +39,18 @@ namespace GMAPI.Controllers
             _hostingEnvironment = environment;
             _repo = repo;
         }
+        // GET: api/Accounts/admin
+        [HttpGet("admin")]
+        public async Task<ActionResult<IEnumerable<AccountForMeDto>>> GetAccountsForAdmin()
+        {
+            var accountsFromRepo = await _context.Accounts
+                .Include(a => a.Jobs).ThenInclude(j => j.Role)
+                .Include(a => a.Jobs).ThenInclude(j => j.Company).ThenInclude(c => c.Image)
+                .ProjectTo<AccountForMeDto>(_mapper.ConfigurationProvider).ToListAsync();
+            
+            return accountsFromRepo;
+        }
+        
 
         // GET: api/Accounts
         [HttpGet]
@@ -126,6 +138,10 @@ namespace GMAPI.Controllers
             {
                 return NotFound();
             }
+            
+            Verification instance = await _context.Verifications.FirstOrDefaultAsync(p => p.AccountId == id);
+            if(instance != null) _context.Verifications.Remove(instance);
+            await _context.SaveChangesAsync();
 
             _context.Accounts.Remove(account);
             await _context.SaveChangesAsync();
