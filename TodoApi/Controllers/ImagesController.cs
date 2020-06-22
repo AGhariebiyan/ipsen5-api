@@ -106,7 +106,7 @@ namespace GMAPI.Controllers
         [HttpPost("companies/{id}")] 
         public async Task<IActionResult> SetCompanyImage([FromRoute] Guid id, [FromForm] IFormFile picture) {
 
-            var companyToUpdate = await _companyRepo.GetCompany(id);
+            var companyToUpdate = _context.Companies.Find(id);
 
             if (companyToUpdate == null)
             {
