@@ -138,14 +138,11 @@ namespace GMAPI.Controllers
             {
                 return NotFound();
             }
-
-            if (account.VerifiedEmail == false)
-            {
-                Verification instance = await _context.Verifications.FirstOrDefaultAsync(p => p.AccountId == id);
-                if(instance != null) _context.Verifications.Remove(instance);
-                await _context.SaveChangesAsync();
-            }
             
+            Verification instance = await _context.Verifications.FirstOrDefaultAsync(p => p.AccountId == id);
+            if(instance != null) _context.Verifications.Remove(instance);
+            await _context.SaveChangesAsync();
+
             _context.Accounts.Remove(account);
             await _context.SaveChangesAsync();
 
