@@ -193,7 +193,6 @@ namespace GMAPI.Controllers
                 await _context.Role.AddAsync(Role);
                 await _context.SaveChangesAsync();
                 worksAt.Role.Id = Role.Id;
-                Console.WriteLine(worksAt.Company);
             }
 
             worksAt.AccountId = id;
