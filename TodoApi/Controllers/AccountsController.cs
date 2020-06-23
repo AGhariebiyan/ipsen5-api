@@ -189,7 +189,7 @@ namespace GMAPI.Controllers
 
         [HttpPost("{id}/jobs")]
         public async Task<IActionResult> AddJob(Guid id, WorksAtForCreateDto worksAtForCreate) {
-
+            
             var worksAt = _mapper.Map<WorksAt>(worksAtForCreate);
             
             Guid jwtId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
@@ -204,7 +204,11 @@ namespace GMAPI.Controllers
 
             
             if (worksAt.Role != null) {
+                var Role = worksAt.Role;
                 worksAt.Role.CanEditCompany = true;
+                await _context.Role.AddAsync(Role);
+                await _context.SaveChangesAsync();
+                worksAt.Role.Id = Role.Id;
             }
 
             worksAt.AccountId = id;
@@ -212,7 +216,7 @@ namespace GMAPI.Controllers
             userToUpdate.Jobs.Add(worksAt);
             if (await _context.SaveChangesAsync() > 0)
             {
-                return Ok();
+                return Ok(worksAt);
             }
             else {
                 return BadRequest("Did not update");
