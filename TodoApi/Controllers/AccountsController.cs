@@ -200,7 +200,7 @@ namespace GMAPI.Controllers
             userToUpdate.Jobs.Add(worksAt);
             if (await _context.SaveChangesAsync() > 0)
             {
-                return Ok();
+                return Ok(worksAt);
             }
             else {
                 return BadRequest("Did not update");
