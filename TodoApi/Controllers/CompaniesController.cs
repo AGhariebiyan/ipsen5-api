@@ -54,7 +54,7 @@ namespace GMAPI.Controllers
         {
             
             var Jobs = await _context.WorksAt.Where(w => w.AccountId == Id).Select(w => w.CompanyId).ToListAsync();
-            var companiesFromRepo = await _context.Companies.Where(c => !Jobs.Contains(c.Id)).ToListAsync();
+            var companiesFromRepo = await _context.Companies.Where(c => !Jobs.Contains(c.Id)).Include(c => c.Image).ToListAsync();
             var companiesForReturn = _mapper.Map<IEnumerable<CompanyForReturnDto>>(companiesFromRepo);
 
             return Ok(companiesForReturn);

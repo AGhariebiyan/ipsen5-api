@@ -81,6 +81,13 @@ namespace GMAPI.Controllers
 
             return Ok(returnAccount);
         }
+        
+        [HttpGet("{Id}/jobrequests")]
+        public async Task<ActionResult<WorksAt[]>> GetJobRequests(Guid Id)
+        {
+            var JobRequests = await _context.WorksAt.Where(w => w.CompanyId == Id).IgnoreQueryFilters<WorksAt>().ToListAsync();
+            return Ok(JobRequests);
+        }
 
         // PUT: api/Accounts/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
@@ -196,7 +203,7 @@ namespace GMAPI.Controllers
             userToUpdate.Jobs.Add(worksAt);
             if (await _context.SaveChangesAsync() > 0)
             {
-                return Ok();
+                return Ok(worksAt);
             }
             else {
                 return BadRequest("Did not update");
