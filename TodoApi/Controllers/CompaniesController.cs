@@ -10,6 +10,7 @@ using GMAPI.Dtos;
 using GMAPI.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GMAPI.Controllers
 {
@@ -19,10 +20,12 @@ namespace GMAPI.Controllers
     {
         private readonly ICompanyRepository _repo;
         private readonly IMapper _mapper;
-        public CompaniesController(ICompanyRepository repo, IMapper mapper)
+        private PostgresDatabaseContext _context;
+        public CompaniesController(ICompanyRepository repo, IMapper mapper, PostgresDatabaseContext context)
         {
             _repo = repo;
             _mapper = mapper;
+            _context = context;
         }
 
         [HttpGet("{id}")]
@@ -41,6 +44,17 @@ namespace GMAPI.Controllers
         public async Task<IActionResult> GetCompanies() {
             var companiesFromRepo = await _repo.GetCompanies();
 
+            var companiesForReturn = _mapper.Map<IEnumerable<CompanyForReturnDto>>(companiesFromRepo);
+
+            return Ok(companiesForReturn);
+        }
+
+        [HttpGet("{id}/forRegistration")]
+        public async Task<IActionResult> GetCompaniesForRegistration(Guid Id)
+        {
+            
+            var Jobs = await _context.WorksAt.Where(w => w.AccountId == Id).Select(w => w.CompanyId).ToListAsync();
+            var companiesFromRepo = await _context.Companies.Where(c => !Jobs.Contains(c.Id)).ToListAsync();
             var companiesForReturn = _mapper.Map<IEnumerable<CompanyForReturnDto>>(companiesFromRepo);
 
             return Ok(companiesForReturn);
