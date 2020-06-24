@@ -23,6 +23,7 @@ namespace GMAPI.Other
             CreateMap<WorksAtForCreateDto, WorksAt>();
             CreateMap<WorksAtForUpdateDto, WorksAt>();
             CreateMap<RoleForUpdateDto, Role>();
+            CreateMap<AccountForPasswordDto, Account >();
         }
         
     }

@@ -151,21 +151,25 @@ namespace GMAPI.Controllers
 
         // PUT: api/Accounts/5/password
         [HttpPut("{id}/password")]
-        public async Task<ActionResult<AccountDto>> ChangePassword(Guid id, String password)
+        public async Task<ActionResult> ChangePassword(Guid id, AccountForPasswordDto changedAccount)
         {
+            if (id != changedAccount.Id)
+            {
+                return BadRequest();
+            }
             var account = await _context.Accounts.FindAsync(id);
             if (account == null)
             {
                 return NotFound();
             }
 
-            PasswordService.CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
+            PasswordService.CreatePasswordHash(changedAccount.Password, out var passwordHash, out var passwordSalt);
 
             account.PasswordHash = passwordHash;
             account.PasswordSalt = passwordSalt;
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<AccountDto>(account);;
+            return Ok();
         }
 
         [HttpPut("{id}/Image")]
