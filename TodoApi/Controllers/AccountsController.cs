@@ -39,6 +39,18 @@ namespace GMAPI.Controllers
             _hostingEnvironment = environment;
             _repo = repo;
         }
+        // GET: api/Accounts/admin
+        [HttpGet("admin")]
+        public async Task<ActionResult<IEnumerable<AccountForMeDto>>> GetAccountsForAdmin()
+        {
+            var accountsFromRepo = await _context.Accounts
+                .Include(a => a.Jobs).ThenInclude(j => j.Role)
+                .Include(a => a.Jobs).ThenInclude(j => j.Company).ThenInclude(c => c.Image)
+                .ProjectTo<AccountForMeDto>(_mapper.ConfigurationProvider).ToListAsync();
+
+            return accountsFromRepo;
+        }
+
 
         // GET: api/Accounts
         [HttpGet]
@@ -48,7 +60,7 @@ namespace GMAPI.Controllers
                 .Include(a => a.Jobs).ThenInclude(j => j.Role)
                 .Include(a => a.Jobs).ThenInclude(j => j.Company).ThenInclude(c => c.Image)
                 .ProjectTo<AccountDto>(_mapper.ConfigurationProvider).ToListAsync();
-            
+
             return accountsFromRepo;
         }
 
@@ -56,7 +68,11 @@ namespace GMAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<AccountDto>> GetAccount(Guid id)
         {
-            var account = await _context.Accounts.Include(a => a.Image).FirstOrDefaultAsync(a => a.Id == id);
+            var account = await _context.Accounts
+                .Include(a => a.Image)
+                .Include(a=>a.Jobs).ThenInclude(j => j.Company)
+                .Include(a => a.Jobs).ThenInclude(j => j.Role)
+                .FirstOrDefaultAsync(a => a.Id == id);
 
             if (account == null)
             {
@@ -81,6 +97,15 @@ namespace GMAPI.Controllers
 
             return Ok(returnAccount);
         }
+        
+        [HttpGet("{Id}/jobrequests")]
+        public async Task<ActionResult<WorksAt[]>> GetJobRequests(Guid Id)
+        {
+            var JobRequests = await _context.WorksAt.Where(w => w.CompanyId == Id)
+                .Where(w => w.Accepted == false).Include(w => w.Account)
+                .Include(w => w.Company).Include(w => w.Role).IgnoreQueryFilters<WorksAt>().ToListAsync();
+            return Ok(JobRequests);
+        }
 
         // PUT: api/Accounts/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
@@ -94,7 +119,7 @@ namespace GMAPI.Controllers
             }
 
             var accountFromRepo = await _repo.GetAccount(id);
-                
+
             _mapper.Map(accountForUpdate, accountFromRepo);
 
             try
@@ -127,6 +152,10 @@ namespace GMAPI.Controllers
                 return NotFound();
             }
 
+            Verification instance = await _context.Verifications.FirstOrDefaultAsync(p => p.AccountId == id);
+            if (instance != null) _context.Verifications.Remove(instance);
+            await _context.SaveChangesAsync();
+
             _context.Accounts.Remove(account);
             await _context.SaveChangesAsync();
 
@@ -135,22 +164,56 @@ namespace GMAPI.Controllers
 
         // PUT: api/Accounts/5/password
         [HttpPut("{id}/password")]
-        public async Task<ActionResult<AccountDto>> ChangePassword(Guid id, String password)
+        public async Task<ActionResult> ChangePassword(Guid id, AccountForPasswordDto changedAccount)
         {
+            if (id != changedAccount.Id)
+            {
+                return BadRequest();
+            }
             var account = await _context.Accounts.FindAsync(id);
             if (account == null)
             {
                 return NotFound();
             }
 
-            PasswordService.CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
+            PasswordService.CreatePasswordHash(changedAccount.Password, out var passwordHash, out var passwordSalt);
 
             account.PasswordHash = passwordHash;
             account.PasswordSalt = passwordSalt;
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<AccountDto>(account);;
+            return Ok();
         }
+
+        [HttpGet("roles")]
+        public async Task<IActionResult> GetRoles() {
+            var roles = await _context.PermissionRoles.ToListAsync();
+            return Ok(roles);
+        }
+        
+        [HttpPut("{id}/roles/{roleId}")]
+        public async Task<IActionResult> UpdateUserRole(Guid id, Guid roleId) {
+            PermissionRole role = await _context.PermissionRoles.FirstOrDefaultAsync(r => r.Id == roleId);
+            if (role == null) {
+                return BadRequest("Role doesn't exist");
+            }
+            Account account = await _context.Accounts.FirstOrDefaultAsync(a => a.Id == id);
+            if (account == null) {
+                return BadRequest("User not found");
+            }
+
+            account.RoleId = role.Id;
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                return Ok();
+            }
+            else {
+                return BadRequest("Could not update role");
+            }
+        
+        }
+
+
 
         [HttpPut("{id}/Image")]
         public async Task<ActionResult> SetImage(Guid id, Image image)
@@ -173,7 +236,7 @@ namespace GMAPI.Controllers
 
         [HttpPost("{id}/jobs")]
         public async Task<IActionResult> AddJob(Guid id, WorksAtForCreateDto worksAtForCreate) {
-
+            
             var worksAt = _mapper.Map<WorksAt>(worksAtForCreate);
             
             Guid jwtId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
@@ -188,7 +251,11 @@ namespace GMAPI.Controllers
 
             
             if (worksAt.Role != null) {
-                worksAt.Role.canEditCompany = true;
+                var Role = worksAt.Role;
+                worksAt.Role.CanEditCompany = true;
+                await _context.Role.AddAsync(Role);
+                await _context.SaveChangesAsync();
+                worksAt.Role.Id = Role.Id;
             }
 
             worksAt.AccountId = id;
@@ -196,7 +263,7 @@ namespace GMAPI.Controllers
             userToUpdate.Jobs.Add(worksAt);
             if (await _context.SaveChangesAsync() > 0)
             {
-                return Ok();
+                return Ok(worksAt);
             }
             else {
                 return BadRequest("Did not update");
@@ -226,6 +293,26 @@ namespace GMAPI.Controllers
             else {
                 return BadRequest("Could not update the job");
             }
+        }
+
+        [HttpPut("jobs/{jobId}")]
+        public async Task<IActionResult> AcceptJobRequest(Guid jobId, WorksAt worksAt)
+        {
+
+            if(jobId != worksAt.Id)
+            {
+                return BadRequest("Id's do not match");
+            }
+
+            var JobFromRepo = await _context.WorksAt.Where(w => w.Id == worksAt.Id)
+                .Where(w => w.AccountId == worksAt.AccountId)
+                .IgnoreQueryFilters().SingleAsync();
+            JobFromRepo.Accepted = true;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(JobFromRepo);
+
         }
 
         [HttpDelete("{id}/jobs/{jobId}")]
@@ -258,5 +345,31 @@ namespace GMAPI.Controllers
 
         }
 
+
+        [HttpDelete("jobs/{jobId}")]
+         public async Task<IActionResult> DenyJob(Guid jobId)
+         {
+
+            var worksAtToRemove = await _context.WorksAt.IgnoreQueryFilters().FirstOrDefaultAsync(wa => wa.Id == jobId);
+            if (worksAtToRemove == null)
+            {
+                return BadRequest("You are not working for this company");
+            }
+
+            _context.WorksAt.Remove(worksAtToRemove);
+
+
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest("Did not update");
+            }
+
+         }
+
     }
+
 }

@@ -16,6 +16,7 @@ namespace GMAPI.Data
         Task<bool> DeleteCompany(Guid id);
 
         Task<Company> UpdateCompany(Guid id, Company company);
+        Task<bool> CanEditCompany(Guid companyId, Guid accountId);
 
         Task<bool> SaveAll();
     }
