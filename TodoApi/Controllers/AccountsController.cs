@@ -97,6 +97,15 @@ namespace GMAPI.Controllers
 
             return Ok(returnAccount);
         }
+        
+        [HttpGet("{Id}/jobrequests")]
+        public async Task<ActionResult<WorksAt[]>> GetJobRequests(Guid Id)
+        {
+            var JobRequests = await _context.WorksAt.Where(w => w.CompanyId == Id)
+                .Where(w => w.Accepted == false).Include(w => w.Account)
+                .Include(w => w.Company).Include(w => w.Role).IgnoreQueryFilters<WorksAt>().ToListAsync();
+            return Ok(JobRequests);
+        }
 
         // PUT: api/Accounts/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
@@ -286,6 +295,26 @@ namespace GMAPI.Controllers
             }
         }
 
+        [HttpPut("jobs/{jobId}")]
+        public async Task<IActionResult> AcceptJobRequest(Guid jobId, WorksAt worksAt)
+        {
+
+            if(jobId != worksAt.Id)
+            {
+                return BadRequest("Id's do not match");
+            }
+
+            var JobFromRepo = await _context.WorksAt.Where(w => w.Id == worksAt.Id)
+                .Where(w => w.AccountId == worksAt.AccountId)
+                .IgnoreQueryFilters().SingleAsync();
+            JobFromRepo.Accepted = true;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(JobFromRepo);
+
+        }
+
         [HttpDelete("{id}/jobs/{jobId}")]
         public async Task<IActionResult> RemoveJob(Guid id, Guid jobId)
         {
@@ -316,5 +345,31 @@ namespace GMAPI.Controllers
 
         }
 
+
+        [HttpDelete("jobs/{jobId}")]
+         public async Task<IActionResult> DenyJob(Guid jobId)
+         {
+
+            var worksAtToRemove = await _context.WorksAt.IgnoreQueryFilters().FirstOrDefaultAsync(wa => wa.Id == jobId);
+            if (worksAtToRemove == null)
+            {
+                return BadRequest("You are not working for this company");
+            }
+
+            _context.WorksAt.Remove(worksAtToRemove);
+
+
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest("Did not update");
+            }
+
+         }
+
     }
+
 }

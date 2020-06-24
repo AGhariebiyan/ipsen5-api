@@ -9,7 +9,6 @@ namespace GMAPI.Models
     public class WorksAt
     {
         public Guid Id { get; set; }
-
         public Account Account { get; set; }
         public Guid AccountId { get; set; }
         public Company Company { get; set; }
@@ -17,6 +16,7 @@ namespace GMAPI.Models
         [Required]
         public Role Role { get; set; }
         public Guid RoleId { get; set; }
+        public Boolean Accepted { get; set; }
 
     }
 }

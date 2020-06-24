@@ -38,6 +38,9 @@ namespace GMAPI.Models
             base.OnModelCreating(builder);
 
             builder.Entity<Company>().HasQueryFilter(p => p.Active);
+
+            builder.Entity<WorksAt>().HasQueryFilter(w => w.Accepted);
+
         }
     }
 }
