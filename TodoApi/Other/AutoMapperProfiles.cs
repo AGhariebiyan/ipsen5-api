@@ -19,6 +19,7 @@ namespace GMAPI.Other
             CreateMap<Image, ImageDto>();
             CreateMap<Company, CompanyForReturnDto>();
             CreateMap<CompanyForUpdateDto, Company>();
+            CreateMap<CompanyForCreateDto, Company>();
             CreateMap<WorksAt, WorksAtForReturnDto>();
             CreateMap<WorksAtForCreateDto, WorksAt>();
             CreateMap<WorksAtForUpdateDto, WorksAt>();

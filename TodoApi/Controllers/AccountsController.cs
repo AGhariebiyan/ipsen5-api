@@ -47,10 +47,10 @@ namespace GMAPI.Controllers
                 .Include(a => a.Jobs).ThenInclude(j => j.Role)
                 .Include(a => a.Jobs).ThenInclude(j => j.Company).ThenInclude(c => c.Image)
                 .ProjectTo<AccountForMeDto>(_mapper.ConfigurationProvider).ToListAsync();
-            
+
             return accountsFromRepo;
         }
-        
+
 
         // GET: api/Accounts
         [HttpGet]
@@ -60,7 +60,7 @@ namespace GMAPI.Controllers
                 .Include(a => a.Jobs).ThenInclude(j => j.Role)
                 .Include(a => a.Jobs).ThenInclude(j => j.Company).ThenInclude(c => c.Image)
                 .ProjectTo<AccountDto>(_mapper.ConfigurationProvider).ToListAsync();
-            
+
             return accountsFromRepo;
         }
 
@@ -68,7 +68,11 @@ namespace GMAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<AccountDto>> GetAccount(Guid id)
         {
-            var account = await _context.Accounts.Include(a => a.Image).FirstOrDefaultAsync(a => a.Id == id);
+            var account = await _context.Accounts
+                .Include(a => a.Image)
+                .Include(a=>a.Jobs).ThenInclude(j => j.Company)
+                .Include(a => a.Jobs).ThenInclude(j => j.Role)
+                .FirstOrDefaultAsync(a => a.Id == id);
 
             if (account == null)
             {
@@ -106,7 +110,7 @@ namespace GMAPI.Controllers
             }
 
             var accountFromRepo = await _repo.GetAccount(id);
-                
+
             _mapper.Map(accountForUpdate, accountFromRepo);
 
             try
@@ -138,9 +142,9 @@ namespace GMAPI.Controllers
             {
                 return NotFound();
             }
-            
+
             Verification instance = await _context.Verifications.FirstOrDefaultAsync(p => p.AccountId == id);
-            if(instance != null) _context.Verifications.Remove(instance);
+            if (instance != null) _context.Verifications.Remove(instance);
             await _context.SaveChangesAsync();
 
             _context.Accounts.Remove(account);
@@ -172,6 +176,36 @@ namespace GMAPI.Controllers
             return Ok();
         }
 
+        [HttpGet("roles")]
+        public async Task<IActionResult> GetRoles() {
+            var roles = await _context.PermissionRoles.ToListAsync();
+            return Ok(roles);
+        }
+        
+        [HttpPut("{id}/roles/{roleId}")]
+        public async Task<IActionResult> UpdateUserRole(Guid id, Guid roleId) {
+            PermissionRole role = await _context.PermissionRoles.FirstOrDefaultAsync(r => r.Id == roleId);
+            if (role == null) {
+                return BadRequest("Role doesn't exist");
+            }
+            Account account = await _context.Accounts.FirstOrDefaultAsync(a => a.Id == id);
+            if (account == null) {
+                return BadRequest("User not found");
+            }
+
+            account.RoleId = role.Id;
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                return Ok();
+            }
+            else {
+                return BadRequest("Could not update role");
+            }
+        
+        }
+
+
+
         [HttpPut("{id}/Image")]
         public async Task<ActionResult> SetImage(Guid id, Image image)
         {
@@ -193,7 +227,7 @@ namespace GMAPI.Controllers
 
         [HttpPost("{id}/jobs")]
         public async Task<IActionResult> AddJob(Guid id, WorksAtForCreateDto worksAtForCreate) {
-
+            
             var worksAt = _mapper.Map<WorksAt>(worksAtForCreate);
             
             Guid jwtId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
@@ -208,7 +242,11 @@ namespace GMAPI.Controllers
 
             
             if (worksAt.Role != null) {
+                var Role = worksAt.Role;
                 worksAt.Role.CanEditCompany = true;
+                await _context.Role.AddAsync(Role);
+                await _context.SaveChangesAsync();
+                worksAt.Role.Id = Role.Id;
             }
 
             worksAt.AccountId = id;
@@ -216,7 +254,7 @@ namespace GMAPI.Controllers
             userToUpdate.Jobs.Add(worksAt);
             if (await _context.SaveChangesAsync() > 0)
             {
-                return Ok();
+                return Ok(worksAt);
             }
             else {
                 return BadRequest("Did not update");
