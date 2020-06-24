@@ -61,7 +61,8 @@ namespace GMAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateCompany(Company comp) {
+        public async Task<IActionResult> CreateCompany(CompanyForCreateDto compForCreate) {
+            var comp = _mapper.Map<Company>(compForCreate);
             var companyToCreate = await _repo.CreateCompany(comp);
             return Ok(companyToCreate);
         }
